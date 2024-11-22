@@ -18,3 +18,4 @@
    DB_PASSWORD=<your mySQL password>
    DB_NAME=<your db name>
    ```
+7. Start project with `node app.js`
