@@ -92,24 +92,55 @@ h1 {
     margin: 20px;
 }
 
-.submit {
-    position: relative;
-    width: 150px;
-    height: 50px;
+td:has(button) {
+    display: flex;
+    justify-content: space-evenly;
+    width: 200px;
+}
+
+button {
+    width: clamp(75px, 40%, 150px);
+    padding: 10px;
     cursor: pointer;
-    margin: 20px;
-    border-radius: 50px;
+    border-radius: 1000px;
     border: none;
     color: white;
-    font-size: 1rem;
+    font-size: 0.75rem;
     font-weight: bold;
+}
+
+.submit {
     background-color: dodgerblue;
 }
 
-button:hover {
+.submit:hover {
     background-color: cornflowerblue;
 }
 
-button:active {
+.submit:active {
     background-color: lightblue;
+}
+
+.delete {
+    background-color: red;
+}
+
+.delete:hover {
+    background-color: orangered;
+}
+
+.delete:active {
+    background-color: #ff9045;
+}
+
+.edit {
+    background-color: green;
+}
+
+.edit:hover {
+    background-color: darkseagreen;
+}
+
+.edit:active {
+    background-color: lightgreen;
 }

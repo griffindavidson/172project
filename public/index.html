@@ -15,6 +15,7 @@
                     <th>Name</th>
                     <th>Email</th>
                     <th>Password</th>
+                    <th>Options</th>
                 </tr>
             </thead>
             <tbody id="dynamic-content"></tbody>
@@ -29,9 +30,11 @@
                     <td>
                         <input type="text" placeholder="Password" maxlength="30" id="password-input" required>
                     </td>
+                    <td>
+                        <button onClick="submit()" class="submit">Submit</button>
+                    </td>
                 </tr>
             </tbody>
         </table>
-        <button onClick="submit()" class="submit">Add new User</button>
     </body>
 </html>
