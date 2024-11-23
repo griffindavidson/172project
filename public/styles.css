@@ -98,7 +98,7 @@ h1 {
 td:has(button) {
     display: flex;
     justify-content: space-evenly;
-    width: 200px;
+    min-width: 200px;
 }
 
 button {
