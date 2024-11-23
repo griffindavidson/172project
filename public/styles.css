@@ -1,3 +1,4 @@
+/* CSS Resets DO NOT TOUCH */
 *,
 *::before,
 *::after {
@@ -11,6 +12,10 @@
 
 body {
     width: 100vw;
+}
+/* CSS Resets DO NOT TOUCH */
+
+body {
     height: 100vh;
     display: grid;
     place-content: center;
