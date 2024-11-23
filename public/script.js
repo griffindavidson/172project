@@ -21,3 +21,28 @@ document.addEventListener('DOMContentLoaded', () => {
         })
     .catch(error => console.error('Error fetching data: ', error));
 })
+
+async function submit() {
+    const name = document.getElementById('name-input').value;
+    const email = document.getElementById('email-input').value;
+    const password = document.getElementById('password-input').value;
+
+    try {
+        const response = await fetch('/api/USERS', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', },
+            body: JSON.stringify({ name, email, password }),
+        });
+
+        // handle server response
+        if (response.ok) {
+            location.reload();
+        } else {
+            const error = await response.text();
+            console.log(`Error adding user: ${error}`);
+        }
+    } catch (err) {
+        console.error("Error submitting data: ", err);
+    }
+}
+

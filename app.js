@@ -24,8 +24,10 @@ app.get('/api/USERS', (req, res) => {
     });
 });
 
-app.post('/USERS', (req, res) => {
-    const { name, email, password } = req.body();
+
+
+app.post('/api/USERS', (req, res) => {
+    const { name, email, password } = req.body;
     const query = 'INSERT INTO USERS (name, email, password) VALUES (?, ?, ?)';
     db.query(query, [name, email, password], (err, results) => {
         if (err) {

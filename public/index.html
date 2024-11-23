@@ -8,17 +8,30 @@
         <script type="text/javascript" src="./script.js" defer></script>
     </head>
     <body>
-        <div>
-            <table>
-                <thead>
-                    <tr>
-                        <th>Name</th>
-                        <th>Email</th>
-                        <th>Password</th>
-                    </tr>
-                </thead>
-                <tbody id="dynamic-content"></tbody>
-            </table>
-        </div>
+        <h1>Users</h1>
+        <table>
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Password</th>
+                </tr>
+            </thead>
+            <tbody id="dynamic-content"></tbody>
+            <tbody>
+                <tr>
+                    <td>
+                        <input type="text" placeholder="John Smith" maxlength="15" id="name-input"  required>
+                    </td>
+                    <td>
+                        <input type="text" placeholder="johnsmith@example.com" maxlength="30" id="email-input" required>
+                    </td>
+                    <td>
+                        <input type="text" placeholder="Password" maxlength="30" id="password-input" required>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+        <button onClick="submit()" class="submit">Add new User</button>
     </body>
 </html>
