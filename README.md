@@ -11,7 +11,7 @@
 5. install required packages:
    -  `npm install express mysql2 dotenv body-parser`
 
-6. add .env file: `touch .env`
+6. add .env file:
    ```
    DB_HOST=localhost
    DB_USER=root
