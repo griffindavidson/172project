@@ -264,6 +264,20 @@ app.post('/api/space-rules', (req, res) => {
 });
 
 // SPACE RULES GET METHOD
+app.get('/api/space-rules', (req, res) => {
+    const query = `
+        SELECT sr.space_id, s.space_name, sr.min_duration_minutes, sr.max_duration_minutes, sr.created_at, sr.modified_at
+        FROM SpaceRules sr
+        JOIN Spaces s ON s.space_id = sr.space_id
+    `;
+    db.query(query, (err, results) => {
+        if (err) {
+            res.status(500).json({ error: err.message });
+        } else {
+            res.json(results);
+        }
+    });
+});
 
 // SPACE RULES DELETE METHOD
 

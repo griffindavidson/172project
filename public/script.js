@@ -172,24 +172,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 // populate rows
                 data.forEach(reservation => {
 
-                    function formatDateTime(isoString) {
-                        const date = new Date(isoString);
-
-                        // Format date and time
-                        const formattedDate = date.toLocaleString('en-US', {
-                            year: 'numeric',
-                            month: 'short',
-                            day: 'numeric',
-                            hour: '2-digit',
-                            minute: '2-digit',
-                            hour12: true,
-                            timeZoneName: 'short', // Includes time zone abbreviation like PST
-                        });
-
-                        // Replace comma after the date to match the required format
-                        return formattedDate.replace(',', ' at');
-                    }
-
                     const row = document.createElement('tr');
 
                     row.innerHTML = `
@@ -212,6 +194,38 @@ document.addEventListener('DOMContentLoaded', () => {
                 attachDeleteListeners();
             })
         .catch(error => { console.error("Error fetching Reservations", error) });
+
+        // grab space rules
+        fetch('/api/space-rules')
+            .then(response => response.json())
+            .then(data => {
+
+                const tableBody = document.getElementById('dynamic-content-rules')
+
+                // clear any potential innerHTML
+                tableBody.innerHTML = '';
+
+                // populate rows
+                data.forEach(rule => {
+
+                    const row = document.createElement('tr');
+
+                    row.innerHTML = `
+                        <td>${rule.space_name}</td>
+                        <td>${rule.min_duration_minutes}</td>
+                        <td>${rule.max_duration_minutes}</td>
+                        <td>${formatDateTime(rule.created_at)}</td>
+                        <td>${formatDateTime(rule.modified_at)}</td>
+                        <td>
+                            <button class="delete" data-id="${rule.space_id}">Delete</button>
+                            <button class="edit">Edit</button>
+                        </td>
+                    `;
+                    tableBody.appendChild(row);
+                });
+                attachDeleteListeners();
+            })
+        .catch(error => { console.error("Error fetching Space Rules", error) });
 });
 
 // still broken, will reimplement later
@@ -269,4 +283,22 @@ function attachDeleteListeners() {
             deleteUser(id);
         })
     })
+}
+
+function formatDateTime(isoString) {
+    const date = new Date(isoString);
+
+    // Format date and time
+    const formattedDate = date.toLocaleString('en-US', {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: true,
+        timeZoneName: 'short', // Includes time zone abbreviation like PST
+    });
+
+    // Replace comma after the date to match the required format
+    return formattedDate.replace(',', ' at');
 }
