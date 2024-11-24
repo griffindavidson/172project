@@ -88,11 +88,15 @@ h1 {
 }
 
 td:has(button) {
-    display: block;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
 }
 
 button {
-    width: clamp(100%, 40%, 150px);
+    width: clamp(75px, 50%, 200px);
     padding: 10px;
     cursor: pointer;
     border-radius: 1000px;
@@ -100,6 +104,7 @@ button {
     color: white;
     font-size: 0.75rem;
     font-weight: bold;
+    flex-shrink: 0;
 }
 
 .submit {

@@ -61,13 +61,14 @@ app.delete('/api/Users', (req, res) => {
     const query = 'DELETE FROM Users WHERE user_id = ?';
     db.query(query, [id], (err, results) => {
         if (err) {
-            return res.status(500).send(err);
+            console.log("Database Error:", err);
+            return res.status(500).send({ error: "Internal Server Error"});
         }
 
-        if (results.affected_rows > 0) {
-            location.reload();
+        if (results.affectedRows > 0) {
+            res.status(200).send({ message: "User deleted sucessfully" });
         } else {
-            res.status(404).send("User not found");
+            res.status(404).send({ error: "User not found" });
         }
     });
 });

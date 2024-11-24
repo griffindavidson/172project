@@ -39,12 +39,7 @@ document.addEventListener('DOMContentLoaded', () => {
             });
 
             // Add click event listeners for delete buttons
-            document.querySelectorAll('.delete').forEach(button => {
-                button.addEventListener('click', () => {
-                    const id = button.getAttribute('data-id');
-                    deleteUser(id);
-                });
-            });
+            attachDeleteListeners();
         })
         .catch(error => console.error('Error fetching data: ', error));
 });
@@ -84,10 +79,24 @@ function deleteUser(id) {
     })
     .then(response => {
         if (response.ok) {
-            location.reload();
+            // row removed on server, need to update DOM manually
+            const rowToDelete = document.querySelector(`button[data-id="${id}"`).closest('tr');
+            if (rowToDelete) {
+                rowToDelete.remove();
+            }
         } else {
             console.log("Failed to delete user");
         }
     })
     .catch(error => console.error("Error deleting user:", error));
+}
+
+// run this function when adding new rows
+function attachDeleteListeners() {
+    document.querySelectorAll('.delete').forEach(button => {
+        button.addEventListener('click', () => {
+            const id = button.getAttribute('data-id');
+            deleteUser(id);
+        })
+    })
 }
