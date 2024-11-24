@@ -1,8 +1,9 @@
 document.addEventListener('DOMContentLoaded', () => {
+    // grab Users table
     fetch('/api/Users')
         .then(response => response.json())
         .then(data => {
-            const tableBody = document.getElementById('dynamic-content');
+            const tableBody = document.getElementById('dynamic-content-users');
 
             // Clear existing rows
             tableBody.innerHTML = '';
@@ -41,7 +42,64 @@ document.addEventListener('DOMContentLoaded', () => {
             // Add click event listeners for delete buttons
             attachDeleteListeners();
         })
-        .catch(error => console.error('Error fetching data: ', error));
+        .catch(error => console.error('Error fetching Users: ', error));
+
+        // grab spaces table
+        fetch('/api/spaces')
+            .then(response => response.json())
+            .then(data => {
+                const tableBody = document.getElementById('dynamic-content-spaces');
+
+                //clear any rows
+                tableBody.innerHTML = '';
+
+                //populate rows
+                data.forEach(space => {
+                    const creationStamp = new Date(space.created_at);
+                    const modificationStamp = new Date(space.modified_at);
+
+                    const readableCreationDate = creationStamp.toLocaleString('en-US', {
+                        year: 'numeric',
+                        month: 'short',
+                        day: 'numeric',
+                        hour: '2-digit',
+                        minute: '2-digit',
+                        hour12: true, // Ensures AM/PM format
+                        timeZoneName: 'short' // Adds time zone abbreviation
+                    });
+
+                    const readableModificationDate = modificationStamp.toLocaleString('en-US', {
+                        year: 'numeric',
+                        month: 'short',
+                        day: 'numeric',
+                        hour: '2-digit',
+                        minute: '2-digit',
+                        hour12: true, // Ensures AM/PM format
+                        timeZoneName: 'short' // Adds time zone abbreviation
+                    });
+
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${space.space_id}</td>
+                        <td>${space.host_id}</td>
+                        <td>${space.space_name}</td>
+                        <td>${space.description}</td>
+                        <td>${space.capacity}</td>
+                        <td>${space.is_approved === 1 ? 'Yes' : 'No'}</td>
+                        <td>${readableCreationDate}</td>
+                        <td>${readableModificationDate}</td>
+                        <td>${space.host_first_name}</td>
+                        <td>${space.host_last_name}</td>
+                        <td>
+                            <button class="delete" data-id="${space.space_id}">Delete</button>
+                            <button class="edit">Edit</button>
+                        </td>
+                    `;
+                    tableBody.appendChild(row);
+                });
+                attachDeleteListeners();
+            })
+        .catch(error => { console.error("Error fetching Spaces", error) });
 });
 
 // still broken, will reimplement later

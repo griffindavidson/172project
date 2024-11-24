@@ -14,7 +14,7 @@ app.get('/', (req, res) => {
     res.send('Welcome to the Node.js Website!');
 });
 
-// User Routes
+// ======= User Routes =======
 
 // USER INSERT METHOD
 app.post('/api/Users', (req, res) => {
@@ -73,7 +73,11 @@ app.delete('/api/Users', (req, res) => {
     });
 });
 
-// Space Routes
+// need to add a USER ALTER METHOD here
+
+// ======= Space Routes =======
+
+// SPACE INSERT METHOD
 app.post('/api/spaces', (req, res) => {
     const { host_id, space_name, description, capacity } = req.body;
     const query = `
@@ -92,6 +96,7 @@ app.post('/api/spaces', (req, res) => {
     });
 });
 
+// SPACE GET METHOD
 app.get('/api/spaces', (req, res) => {
     const query = `
         SELECT s.*, u.first_name as host_first_name, u.last_name as host_last_name
@@ -108,7 +113,13 @@ app.get('/api/spaces', (req, res) => {
     });
 });
 
-// Operating Hours Routes
+// SPACE DELETE METHOD here
+
+// SPACE ALTER METHOD here
+
+// ======= Operating Hours Routes =======
+
+// OPERATING HOURS INSERT METHOD
 app.post('/api/operating-hours', (req, res) => {
     const { space_id, day_of_week, open_time, close_time, is_closed } = req.body;
     const query = `
@@ -127,7 +138,15 @@ app.post('/api/operating-hours', (req, res) => {
     });
 });
 
-// Reservation Routes
+// OPERATING HOURS GET METHOD
+
+// OPERATING HOURS DELETE METHOD
+
+// OPERATING HOURS ALTER METHOD
+
+// ======= Reservation Routes =======
+
+// RESERVATIONS INSERT METHOD
 app.post('/api/reservations', (req, res) => {
     const { space_id, user_id, start_time, end_time, created_by } = req.body;
     const query = `
@@ -147,6 +166,7 @@ app.post('/api/reservations', (req, res) => {
     });
 });
 
+// RESERVATIONS GET METHOD
 app.get('/api/reservations/:userId', (req, res) => {
     const query = `
         SELECT r.*, s.space_name, u.first_name, u.last_name
@@ -164,7 +184,9 @@ app.get('/api/reservations/:userId', (req, res) => {
     });
 });
 
-// Update reservation status
+// RESERVATIONS DELETE METHOD
+
+// RESERVATIONS ALTER METHOD
 app.patch('/api/reservations/:reservationId', (req, res) => {
     const { status, last_modified_by } = req.body;
     const query = `
@@ -184,7 +206,9 @@ app.patch('/api/reservations/:reservationId', (req, res) => {
     });
 });
 
-// Space Rules Routes
+// ======= Space Rules Routes =======
+
+// SPACE RULES INSERT METHOD
 app.post('/api/space-rules', (req, res) => {
     const {
         space_id,
@@ -221,7 +245,14 @@ app.post('/api/space-rules', (req, res) => {
     });
 });
 
-// Start Server
+// SPACE RULES GET METHOD
+
+// SPACE RULES DELETE METHOD
+
+// SPACE RULES ALTER METHOD
+
+// ======= Start Server =======
+
 app.listen(PORT, () => {
     console.log(`Server running on http://localhost:${PORT}`);
 });
