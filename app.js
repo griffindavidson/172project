@@ -181,15 +181,19 @@ app.post('/api/reservations', (req, res) => {
 });
 
 // RESERVATIONS GET METHOD
-app.get('/api/reservations/:userId', (req, res) => {
+app.get('/api/reservations/', (req, res) => {
     const query = `
-        SELECT r.*, s.space_name, u.first_name, u.last_name
+        SELECT CONCAT(u.first_name, " ", u.last_name) AS name, s.space_name, r.reservation_id,
+            r.start_time, r.end_time, r.status, r.created_at, r.modified_at,
+            CONCAT(cb.first_name, " ", cb.last_name) AS created_by_name,
+            CONCAT(lmb.first_name, " ", lmb.last_name) AS last_modified_by_name
         FROM Reservations r
         JOIN Spaces s ON r.space_id = s.space_id
         JOIN Users u ON r.user_id = u.user_id
-        WHERE r.user_id = ?
+        LEFT JOIN Users cb ON r.created_by = cb.user_id -- Join for created_by user's name
+        LEFT JOIN Users lmb ON r.last_modified_by = lmb.user_id -- Join for last_modified_by user's name
     `;
-    db.query(query, [req.params.userId], (err, results) => {
+    db.query(query, (err, results) => {
         if (err) {
             res.status(500).json({ error: err.message });
         } else {

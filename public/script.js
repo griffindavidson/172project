@@ -158,6 +158,60 @@ document.addEventListener('DOMContentLoaded', () => {
                 attachDeleteListeners();
             })
             .catch(error => { console.error("Error fetching Operating Hours", error) });
+
+        // grab reservations table
+        fetch('/api/reservations')
+            .then(response => response.json())
+            .then(data => {
+
+                const tableBody = document.getElementById('dynamic-content-reservations');
+
+                // clear any extraenous innerHTML
+                tableBody.innerHTML = '';
+
+                // populate rows
+                data.forEach(reservation => {
+
+                    function formatDateTime(isoString) {
+                        const date = new Date(isoString);
+
+                        // Format date and time
+                        const formattedDate = date.toLocaleString('en-US', {
+                            year: 'numeric',
+                            month: 'short',
+                            day: 'numeric',
+                            hour: '2-digit',
+                            minute: '2-digit',
+                            hour12: true,
+                            timeZoneName: 'short', // Includes time zone abbreviation like PST
+                        });
+
+                        // Replace comma after the date to match the required format
+                        return formattedDate.replace(',', ' at');
+                    }
+
+                    const row = document.createElement('tr');
+
+                    row.innerHTML = `
+                        <td>${reservation.name}</td>
+                        <td>${reservation.space_name}</td>
+                        <td>${formatDateTime(reservation.start_time)}</td>
+                        <td>${formatDateTime(reservation.end_time)}</td>
+                        <td>${reservation.status}</td>
+                        <td>${formatDateTime(reservation.created_at)}</td>
+                        <td>${formatDateTime(reservation.modified_at)}</td>
+                        <td>${reservation.created_by_name}</td>
+                        <td>${reservation.last_modified_by_name}</td>
+                        <td>
+                            <button class="delete" data-id="${reservation.reservation_id}">Delete</button>
+                            <button class="edit">Edit</button>
+                        </td>
+                    `;
+                    tableBody.appendChild(row);
+                });
+                attachDeleteListeners();
+            })
+        .catch(error => { console.error("Error fetching Reservations", error) });
 });
 
 // still broken, will reimplement later
