@@ -47,7 +47,7 @@ body {
 }
 
 table {
-    width: 80%;
+    width: clamp(500px, 80%, 1250px);
     border-collapse: collapse;
     background-color: var(--root-background-color);
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
