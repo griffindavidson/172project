@@ -101,3 +101,36 @@ ON Spaces(host_id);
 
 CREATE INDEX idx_reservations_space_time_status
 ON Reservations(space_id, start_time, end_time, status);
+
+-- sample data to use for debugging and likely demonstrating
+
+INSERT INTO Users (first_name, last_name, email, password_hash, is_host)
+VALUES
+('Alice', 'Smith', 'alice.smith@example.com', 'hashed_password1', TRUE),
+('Bob', 'Johnson', 'bob.johnson@example.com', 'hashed_password2', FALSE),
+('Charlie', 'Brown', 'charlie.brown@example.com', 'hashed_password3', TRUE);
+
+INSERT INTO Spaces (host_id, space_name, description, capacity, is_approved)
+VALUES
+(1, 'Cozy Meeting Room', 'A small, comfortable room for meetings.', 10, TRUE),
+(3, 'Large Conference Hall', 'Ideal for large gatherings and events.', 100, FALSE),
+(1, 'Open Workspace', 'A shared workspace for teams.', 20, TRUE);
+
+INSERT INTO OperatingHours (space_id, day_of_week, open_time, close_time, is_closed)
+VALUES
+(1, 0, '08:00:00', '18:00:00', FALSE),
+(1, 6, '09:00:00', '15:00:00', FALSE),
+(2, 1, '07:00:00', '19:00:00', FALSE),
+(3, 2, '08:00:00', '17:00:00', FALSE);
+
+INSERT INTO Reservations (space_id, user_id, start_time, end_time, status, created_by, last_modified_by)
+VALUES
+(1, 2, '2024-11-25 09:00:00', '2024-11-25 11:00:00', 'confirmed', 2, 2),
+(3, 2, '2024-11-26 14:00:00', '2024-11-26 16:00:00', 'pending', 2, 2),
+(1, 3, '2024-11-27 10:00:00', '2024-11-27 12:00:00', 'completed', 3, 3);
+
+INSERT INTO SpaceRules (space_id, min_duration_minutes, max_duration_minutes, max_advance_days, min_notice_hours, modification_deadline_hours)
+VALUES
+(1, 30, 120, 30, 2, 24),
+(2, 60, 240, 60, 4, 48),
+(3, 15, 180, 14, 1, 12);
