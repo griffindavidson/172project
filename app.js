@@ -15,7 +15,9 @@ app.get('/', (req, res) => {
 });
 
 // User Routes
-app.post('/api/users', (req, res) => {
+
+// USER INSERT METHOD
+app.post('/api/Users', (req, res) => {
     const { first_name, last_name, email, password_hash, is_host } = req.body;
     const query = `
         INSERT INTO Users (first_name, last_name, email, password_hash, is_host)
@@ -33,7 +35,8 @@ app.post('/api/users', (req, res) => {
     });
 });
 
-app.get('/api/users', (req, res) => {
+// USER GET METHOD
+app.get('/api/Users', (req, res) => {
     const query = `
         SELECT user_id, first_name, last_name, email, is_host, created_at
         FROM Users
@@ -43,6 +46,28 @@ app.get('/api/users', (req, res) => {
             res.status(500).json({ error: err.message });
         } else {
             res.json(results);
+        }
+    });
+});
+
+// USER DELETE METHOD
+app.delete('/api/Users', (req, res) => {
+    const { id } = req.body;
+
+    if (!id) {
+        return res.status(400).send("Missing ID Field");
+    }
+
+    const query = 'DELETE FROM Users WHERE user_id = ?';
+    db.query(query, [id], (err, results) => {
+        if (err) {
+            return res.status(500).send(err);
+        }
+
+        if (results.affected_rows > 0) {
+            location.reload();
+        } else {
+            res.status(404).send("User not found");
         }
     });
 });

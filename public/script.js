@@ -1,5 +1,5 @@
 document.addEventListener('DOMContentLoaded', () => {
-    fetch('/api/USERS')
+    fetch('/api/Users')
         .then(response => response.json())
         .then(data => {
             const tableBody = document.getElementById('dynamic-content');
@@ -11,18 +11,14 @@ document.addEventListener('DOMContentLoaded', () => {
             data.forEach(user => {
                 const row = document.createElement('tr');
                 row.innerHTML = `
-                    <td>${user.name}</td>
+                    <td>${user.user_id}</td>
+                    <td>${user.first_name}</td>
+                    <td>${user.last_name}</td>
                     <td>${user.email}</td>
-                    <td>${user.password}</td>
+                    <td>${user.is_host}</td>
+                    <td>${created_at}</td>
                     <td>
-                        <button
-                            class="delete"
-                            data-name="${user.name}"
-                            data-email="${user.email}"
-                            data-password="${user.password}"
-                        >
-                            Delete
-                        </button>
+                        <button class="delete" data-id="${user.user_id}">Delete</button>
                         <button class="edit">Edit</button>
                     </td>
                 `;
@@ -66,11 +62,11 @@ async function submit() {
     }
 }
 
-function deleteUser(name, email, password) {
-    fetch('/api/USERS', {
+function deleteUser(id) {
+    fetch('/api/Users', {
         method: 'DELETE',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name, email, password })
+        body: JSON.stringify({ id })
     })
     .then(response => {
         if (response.ok) {
