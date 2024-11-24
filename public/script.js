@@ -16,7 +16,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     <td>${user.last_name}</td>
                     <td>${user.email}</td>
                     <td>${user.is_host}</td>
-                    <td>${created_at}</td>
+                    <td>${user.created_at}</td>
                     <td>
                         <button class="delete" data-id="${user.user_id}">Delete</button>
                         <button class="edit">Edit</button>
@@ -28,26 +28,27 @@ document.addEventListener('DOMContentLoaded', () => {
             // Add click event listeners for delete buttons
             document.querySelectorAll('.delete').forEach(button => {
                 button.addEventListener('click', () => {
-                    const name = button.getAttribute('data-name');
-                    const email = button.getAttribute('data-email');
-                    const password = button.getAttribute('data-password');
-                    deleteUser(name, email, password);
+                    const id = button.getAttribute('data-id');
+                    deleteUser(id);
                 });
             });
         })
         .catch(error => console.error('Error fetching data: ', error));
 });
 
+// still broken, will reimplement later
 async function submit() {
-    const name = document.getElementById('name-input').value;
+    const firstName = document.getElementById('name-input').value;
+    const lastName = document.getElementById('name-input').value;
     const email = document.getElementById('email-input').value;
-    const password = document.getElementById('password-input').value;
+    const passwordHash = document.getElementById('password-input').value;
+    const isHost = document.getElementByID('password-input').value;
 
     try {
         const response = await fetch('/api/USERS', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json', },
-            body: JSON.stringify({ name, email, password }),
+            body: JSON.stringify({ firstName, lastName, email, passwordHash, isHost }),
         });
 
         // handle server response
