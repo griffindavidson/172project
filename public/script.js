@@ -15,7 +15,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     <td>${user.first_name}</td>
                     <td>${user.last_name}</td>
                     <td>${user.email}</td>
-                    <td>${user.is_host}</td>
+                    <td>${user.is_host === 1 ? 'Yes' : 'No'}</td>
                     <td>${user.created_at}</td>
                     <td>
                         <button class="delete" data-id="${user.user_id}">Delete</button>
