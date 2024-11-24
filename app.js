@@ -99,10 +99,10 @@ app.post('/api/spaces', (req, res) => {
 // SPACE GET METHOD
 app.get('/api/spaces', (req, res) => {
     const query = `
-        SELECT s.*, u.first_name as host_first_name, u.last_name as host_last_name
+        SELECT CONCAT(u.first_name, " ", u.last_name) as host, s.space_name, s.description, s.capacity, s.is_approved,
+            s.created_at, s.modified_at
         FROM Spaces s
         JOIN Users u ON s.host_id = u.user_id
-        WHERE s.is_approved = true
     `;
     db.query(query, (err, results) => {
         if (err) {

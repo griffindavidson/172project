@@ -11,18 +11,6 @@ document.addEventListener('DOMContentLoaded', () => {
             // Populate table rows with data
             data.forEach(user => {
 
-                const timestamp = new Date(user.created_at);
-
-                const readableDate = timestamp.toLocaleString('en-US', {
-                    year: 'numeric',
-                    month: 'short',
-                    day: 'numeric',
-                    hour: '2-digit',
-                    minute: '2-digit',
-                    hour12: true, // Ensures AM/PM format
-                    timeZoneName: 'short' // Adds time zone abbreviation
-                });
-
                 const row = document.createElement('tr');
                 row.innerHTML = `
                     <td>${user.user_id}</td>
@@ -30,7 +18,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     <td>${user.last_name}</td>
                     <td>${user.email}</td>
                     <td>${user.is_host === 1 ? 'Yes' : 'No'}</td>
-                    <td>${readableDate}</td>
+                    <td>${formatDateTime(user.created_at)}</td>
                     <td>
                         <button class="delete" data-id="${user.user_id}">Delete</button>
                         <button class="edit">Edit</button>
@@ -55,41 +43,17 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 //populate rows
                 data.forEach(space => {
-                    const creationStamp = new Date(space.created_at);
-                    const modificationStamp = new Date(space.modified_at);
-
-                    const readableCreationDate = creationStamp.toLocaleString('en-US', {
-                        year: 'numeric',
-                        month: 'short',
-                        day: 'numeric',
-                        hour: '2-digit',
-                        minute: '2-digit',
-                        hour12: true, // Ensures AM/PM format
-                        timeZoneName: 'short' // Adds time zone abbreviation
-                    });
-
-                    const readableModificationDate = modificationStamp.toLocaleString('en-US', {
-                        year: 'numeric',
-                        month: 'short',
-                        day: 'numeric',
-                        hour: '2-digit',
-                        minute: '2-digit',
-                        hour12: true, // Ensures AM/PM format
-                        timeZoneName: 'short' // Adds time zone abbreviation
-                    });
 
                     const row = document.createElement('tr');
+
                     row.innerHTML = `
-                        <td>${space.space_id}</td>
-                        <td>${space.host_id}</td>
+                        <td>${space.host}</td>
                         <td>${space.space_name}</td>
                         <td>${space.description}</td>
                         <td>${space.capacity}</td>
                         <td>${space.is_approved === 1 ? 'Yes' : 'No'}</td>
-                        <td>${readableCreationDate}</td>
-                        <td>${readableModificationDate}</td>
-                        <td>${space.host_first_name}</td>
-                        <td>${space.host_last_name}</td>
+                        <td>${formatDateTime(space.created_at)}</td>
+                        <td>${formatDateTime(space.modified_at)}</td>
                         <td>
                             <button class="delete" data-id="${space.space_id}">Delete</button>
                             <button class="edit">Edit</button>
@@ -129,7 +93,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         const date = new Date();
                         date.setHours(parseInt(hours, 10), parseInt(minutes,10));
 
-                        const formatter = Intl.DateTimeFormat('en-US', {
+                        let formatter = Intl.DateTimeFormat('en-US', {
                             hour: 'numeric',
                             minute: '2-digit',
                             hour12: true,
@@ -289,16 +253,18 @@ function formatDateTime(isoString) {
     const date = new Date(isoString);
 
     // Format date and time
-    const formattedDate = date.toLocaleString('en-US', {
+    let formattedDate = date.toLocaleString('en-US', {
         year: 'numeric',
         month: 'short',
         day: 'numeric',
         hour: '2-digit',
         minute: '2-digit',
         hour12: true,
-        timeZoneName: 'short', // Includes time zone abbreviation like PST
-    });
+    })
 
-    // Replace comma after the date to match the required format
-    return formattedDate.replace(',', ' at');
+   formattedDate = formattedDate.replaceAll(' at', ',')
+   formattedDate = formattedDate.replaceAll(' AM', 'am');
+   formattedDate = formattedDate.replaceAll(' PM', 'pm');
+
+    return formattedDate;
 }
