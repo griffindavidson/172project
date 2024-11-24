@@ -9,6 +9,19 @@ document.addEventListener('DOMContentLoaded', () => {
 
             // Populate table rows with data
             data.forEach(user => {
+
+                const timestamp = new Date(user.created_at);
+
+                const readableDate = timestamp.toLocaleString('en-US', {
+                    year: 'numeric',
+                    month: 'short',
+                    day: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    hour12: true, // Ensures AM/PM format
+                    timeZoneName: 'short' // Adds time zone abbreviation
+                });
+
                 const row = document.createElement('tr');
                 row.innerHTML = `
                     <td>${user.user_id}</td>
@@ -16,7 +29,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     <td>${user.last_name}</td>
                     <td>${user.email}</td>
                     <td>${user.is_host === 1 ? 'Yes' : 'No'}</td>
-                    <td>${user.created_at}</td>
+                    <td>${readableDate}</td>
                     <td>
                         <button class="delete" data-id="${user.user_id}">Delete</button>
                         <button class="edit">Edit</button>

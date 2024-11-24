@@ -59,6 +59,7 @@ th, td {
     text-align: left;
     border: 1px solid var(--table-border-color);
     color: var(--font-color);
+    height: 100%;
 }
 
 th {
@@ -96,13 +97,12 @@ h1 {
 }
 
 td:has(button) {
-    display: flex;
-    justify-content: space-evenly;
-    min-width: 200px;
+    display: block;
+
 }
 
 button {
-    width: clamp(75px, 40%, 150px);
+    width: clamp(100%, 40%, 150px);
     padding: 10px;
     cursor: pointer;
     border-radius: 1000px;
