@@ -27,7 +27,7 @@ CREATE TABLE Spaces (
 
 -- Operating Hours table to store space availability
 CREATE TABLE OperatingHours (
-    operating_hours_id SERIAL PRIMARY KEY,
+--    operating_hours_id SERIAL PRIMARY KEY, <-- No need since this is a weak entity
     space_id BIGINT UNSIGNED,
     day_of_week INTEGER CHECK (day_of_week BETWEEN 0 AND 6),
     open_time TIME NOT NULL,
@@ -47,7 +47,7 @@ CREATE TABLE Reservations (
     user_id BIGINT UNSIGNED,
     start_time TIMESTAMP NOT NULL,
     end_time TIMESTAMP NOT NULL,
-    status VARCHAR(20) CHECK (status IN ('pending', 'confirmed', 'cancelled', 'completed')),
+    status VARCHAR(20) CHECK (status IN ('pending', 'confirmed', 'cancelled', 'completed', 'occupied')),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     modified_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     created_by BIGINT UNSIGNED,
@@ -70,7 +70,7 @@ CREATE TABLE Reservations (
 
 -- Space Rules table to store booking rules and constraints
 CREATE TABLE SpaceRules (
-    rule_id SERIAL PRIMARY KEY,
+--    rule_id SERIAL PRIMARY KEY,  <-- will probably be Weak Entity
     space_id BIGINT UNSIGNED,
     min_duration_minutes INTEGER NOT NULL,
     max_duration_minutes INTEGER NOT NULL,
