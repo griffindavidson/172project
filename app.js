@@ -139,6 +139,20 @@ app.post('/api/operating-hours', (req, res) => {
 });
 
 // OPERATING HOURS GET METHOD
+app.get('/api/operating-hours', (req, res) => {
+    const query = `
+        SELECT o.operating_hours_id, s.space_name, o.day_of_week, o.open_time, o.close_time
+        FROM OperatingHours o
+        JOIN Spaces s ON s.space_id = o.space_id
+    `;
+    db.query(query, (err, results) => {
+        if (err) {
+            res.status(500).json( { error: err.message });
+        } else {
+            res.json(results);
+        }
+    });
+});
 
 // OPERATING HOURS DELETE METHOD
 

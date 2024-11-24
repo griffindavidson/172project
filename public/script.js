@@ -100,6 +100,64 @@ document.addEventListener('DOMContentLoaded', () => {
                 attachDeleteListeners();
             })
         .catch(error => { console.error("Error fetching Spaces", error) });
+
+        // get operating hours table
+        fetch('/api/operating-hours')
+            .then(response => response.json())
+            .then(data => {
+
+                const weekday = {
+                    0: 'Sundays',
+                    1: 'Mondays',
+                    2: 'Tuesdays',
+                    3: 'Wednesdays',
+                    4: 'Thursdays',
+                    5: 'Fridays',
+                    6: 'Saturdays'
+                }
+
+                const tableBody = document.getElementById('dynamic-content-operating');
+
+                // clear any innerHTML
+                tableBody.innerHTML = "";
+
+                // populate rows
+                data.forEach(operation => {
+
+                    function formatTime(inputTime) {
+                        const [hours, minutes] = inputTime.split(":");
+                        const date = new Date();
+                        date.setHours(parseInt(hours, 10), parseInt(minutes,10));
+
+                        const formatter = Intl.DateTimeFormat('en-US', {
+                            hour: 'numeric',
+                            minute: '2-digit',
+                            hour12: true,
+                        });
+
+                        return formatter.format(date);
+                    }
+
+                    const openTime = formatTime(operation.open_time);
+                    const closeTime = formatTime(operation.close_time);
+
+                    const row = document.createElement('tr');
+
+                    row.innerHTML = `
+                        <td>${operation.space_name}</td>
+                        <td>${weekday[operation.day_of_week]}</td>
+                        <td>${openTime}</td>
+                        <td>${closeTime}</td>
+                        <td>
+                            <button class="delete" data-id="${operation.operating_hours_id}">Delete</button>
+                            <button class="edit">Edit</button>
+                        </td>
+                    `;
+                    tableBody.appendChild(row);
+                });
+                attachDeleteListeners();
+            })
+            .catch(error => { console.error("Error fetching Operating Hours", error) });
 });
 
 // still broken, will reimplement later
