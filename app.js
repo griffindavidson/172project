@@ -1,17 +1,123 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const db = require('./db/db');
+const session = require('express-session');
+const bcrypt = require('bcrypt');
 
 const app = express();
 const PORT = 3000;
 
 // Middleware
+app.use(session({
+    secret: 'cmpe172soupersecret',
+    resave: false,
+    saveUninitialized: false,
+    cookie: { secure: process.env.NODE_ENV === 'production' }
+}));
+
 app.use(bodyParser.json());
 app.use(express.static('public'));
 
 // Test Route
 app.get('/', (req, res) => {
     res.send('Welcome to the Node.js Website!');
+});
+
+// Login Page
+
+app.get('/login', (req, res) => {
+    res.sendFile(__dirname + '/public/login.html');
+});
+
+// Login route
+app.post('/api/login', async (req, res) => {
+    const { email, password } = req.body;
+
+    const query = 'SELECT * FROM Users WHERE email = ?';
+    db.query(query, [email], async (err, results) => {
+        if (err) {
+            return res.status(500).json({ error: err.message });
+        }
+
+        if (results.length === 0) {
+            return res.status(401).json({ error: 'Invalid credentials' });
+        }
+
+        const user = results[0];
+        const validPassword = await bcrypt.compare(password, user.password_hash);
+
+        if (!validPassword) {
+            return res.status(401).json({ error: 'Invalid credentials' });
+        }
+
+        // Store user info in session
+        req.session.user = {
+            id: user.user_id,
+            firstName: user.first_name,
+            lastName: user.last_name,
+            email: user.email,
+            isHost: user.is_host
+        };
+
+        res.json({ message: 'Login successful' });
+    });
+});
+
+// Signup route
+app.post('/api/signup', async (req, res) => {
+    const { firstName, lastName, email, password, isHost } = req.body;
+
+    try {
+        // Hash password
+        const saltRounds = 10;
+        const passwordHash = await bcrypt.hash(password, saltRounds);
+
+        const query = `
+            INSERT INTO Users (first_name, last_name, email, password_hash, is_host)
+            VALUES (?, ?, ?, ?, ?)
+        `;
+
+        db.query(query, [firstName, lastName, email, passwordHash, isHost], (err, results) => {
+            if (err) {
+                if (err.code === 'ER_DUP_ENTRY') {
+                    return res.status(400).json({ error: 'Email already exists' }); //<-- if we want we can use email as PK
+                }
+                return res.status(500).json({ error: err.message });
+            }
+
+            // Auto-login after signup
+            req.session.user = {
+                id: results.insertId,
+                firstName,
+                lastName,
+                email,
+                isHost
+            };
+
+            res.status(201).json({ message: 'User created successfully' });
+        });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
+// Logout route
+app.post('/api/logout', (req, res) => {
+    req.session.destroy(err => {
+        if (err) {
+            return res.status(500).json({ error: 'Could not log out' });
+        }
+        res.json({ message: 'Logged out successfully' });
+    });
+});
+
+// Current session info
+app.get('/api/user-session', (req, res) => {
+    if (req.session.user) {
+        res.json(req.session.user);
+    } else {
+        res.status(401).json({ error: 'Not logged in' });
+    }
 });
 
 // ======= User Routes =======

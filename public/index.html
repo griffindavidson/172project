@@ -8,6 +8,19 @@
         <script type="text/javascript" src="./script.js" defer></script>
     </head>
     <body>
+        <!-- Header Section with Auth Controls -->
+        <div id="headerSection" style="display: flex; justify-content: flex-end; padding: 20px; background-color: var(--th-background-color);">
+            <!-- Container for logged-in user -->
+            <div id="userHeader" style="display: none;">
+                <span id="welcomeMessage" style="margin-right: 20px; color: var(--font-color);"></span>
+                <button onclick="handleLogout()" class="delete">Logout</button>
+            </div>
+
+            <!-- Container for login/signup button -->
+            <div id="loginHeader" style="display: none;">
+                <button onclick="window.location.href='/login'" class="submit">Login / Sign Up</button>
+            </div>
+        </div>
         <h1>Users</h1>
         <table>
             <thead>
