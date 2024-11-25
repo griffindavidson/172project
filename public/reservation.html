@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Make a Reservation</title>
+  <link rel="stylesheet" type="text/css" href="./styles.css">
+  <link rel="stylesheet" type="text/css" href="./reservation.css">
+  <script type="text/javascript" src="./reservation.js" defer></script>
+</head>
+<body>
+<div class="headerSection">
+  <div id="userHeader">
+    <span id="welcomeMessage"></span>
+    <button onclick="handleLogout()" class="delete">Logout</button>
+    <button onclick="window.location.href='/database.html'" class="submit">Back to Dashboard</button>
+  </div>
+</div>
+
+<div class="reservation-container">
+  <h1>Make a Reservation</h1>
+
+  <div class="space-selection">
+    <label for="spaceSelect">Select a Space:</label>
+    <select id="spaceSelect" required>
+      <option value="">Choose a space...</option>
+    </select>
+  </div>
+
+  <div id="spaceDetails" class="space-details" style="display: none;">
+    <h2>Space Details</h2>
+    <div class="details-grid">
+      <div>Capacity: <span id="spaceCapacity"></span></div>
+      <div>Minimum Duration: <span id="minDuration"></span> minutes</div>
+      <div>Maximum Duration: <span id="maxDuration"></span> minutes</div>
+    </div>
+  </div>
+
+  <div class="calendar-navigation">
+    <button onclick="previousWeek()" class="nav-button">Previous Week</button>
+    <span id="currentWeek"></span>
+    <button onclick="nextWeek()" class="nav-button">Next Week</button>
+  </div>
+
+  <div class="calendar-container">
+    <div class="time-column">
+      <!-- Time slots will be populated by JS -->
+    </div>
+    <div class="days-grid">
+      <!-- Day columns will be populated by JS -->
+    </div>
+  </div>
+
+  <form id="reservationForm" class="reservation-form" style="display: none;">
+    <h2>Make Reservation</h2>
+    <div class="form-grid">
+      <div class="form-group">
+        <label for="reservationDate">Date:</label>
+        <input type="date" id="reservationDate" name="reservationDate" required>
+      </div>
+      <div class="form-group">
+        <label for="startTime">Start Time:</label>
+        <input type="time" id="startTime" name="startTime" required>
+      </div>
+      <div class="form-group">
+        <label for="endTime">End Time:</label>
+        <input type="time" id="endTime" name="endTime" required>
+      </div>
+    </div>
+    <div class="form-actions">
+      <button type="submit" class="submit">Create Reservation</button>
+    </div>
+  </form>
+</div>
+
+<div id="messageContainer" class="message-container"></div>
+</body>
+</html>
