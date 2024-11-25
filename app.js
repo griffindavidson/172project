@@ -18,6 +18,16 @@ app.use(session({
 app.use(bodyParser.json());
 app.use(express.static('public'));
 
+// Helper function to handle database queries as promises
+function queryDB(sql, params = []) {
+    return new Promise((resolve, reject) => {
+        db.query(sql, params, (err, results) => {
+            if (err) reject(err);
+            else resolve(results);
+        });
+    });
+}
+
 // Login Page
 
 app.get('/', (req, res) => {
@@ -152,7 +162,7 @@ app.get('/api/Users', (req, res) => {
 });
 
 // USER DELETE METHOD
-app.delete('/api/Users', (req, res) => {
+app.delete('/api/Users', async (req, res) => {
     const { id } = req.body;
 
     if (!id) {
@@ -165,20 +175,53 @@ app.delete('/api/Users', (req, res) => {
         return res.status(403).send({ error: "You cannot delete your own account while logged in." });
     }
 
-    const query = 'DELETE FROM Users WHERE user_id = ?';
-    db.query(query, [id], (err, results) => {
-        if (err) {
-            console.log("Database Error:", err);
-            return res.status(500).send({ error: "Internal Server Error" });
-        }
+    try {
+        const affectedRows = await deleteUserCascade(id);
 
-        if (results.affectedRows > 0) {
+        if (affectedRows > 0) {
             res.status(200).send({ message: "User deleted successfully" });
         } else {
             res.status(404).send({ error: "User not found" });
         }
-    });
+    } catch (err) {
+        console.log("Database Error:", err);
+        return res.status(500).send({ error: "Internal Server Error" });
+    }
 });
+
+// Modified helper function specifically for user deletion
+async function deleteUserCascade(userId) {
+    try {
+        // First delete all reservations created by or modified by this user
+        await queryDB('DELETE FROM Reservations WHERE created_by = ? OR last_modified_by = ?', [userId, userId]);
+
+        // Delete all reservations made by this user
+        await queryDB('DELETE FROM Reservations WHERE user_id = ?', [userId]);
+
+        // Delete all operating hours for spaces owned by this user
+        await queryDB(`
+            DELETE oh FROM OperatingHours oh
+            JOIN Spaces s ON oh.space_id = s.space_id
+            WHERE s.host_id = ?
+        `, [userId]);
+
+        // Delete all space rules for spaces owned by this user
+        await queryDB(`
+            DELETE sr FROM SpaceRules sr
+            JOIN Spaces s ON sr.space_id = s.space_id
+            WHERE s.host_id = ?
+        `, [userId]);
+
+        // Delete all spaces owned by this user
+        await queryDB('DELETE FROM Spaces WHERE host_id = ?', [userId]);
+
+        // Finally delete the user and get the result
+        const result = await queryDB('DELETE FROM Users WHERE user_id = ?', [userId]);
+        return result.affectedRows;
+    } catch (error) {
+        throw error;
+    }
+}
 
 
 // need to add a USER ALTER METHOD here
@@ -269,6 +312,40 @@ app.get('/api/spaces/:id', (req, res) => {
 });
 
 // SPACE DELETE METHOD here
+async function deleteSpace(spaceId) {
+    try {
+        // Delete all reservations for this space
+        await queryDB('DELETE FROM Reservations WHERE space_id = ?', [spaceId]);
+
+        // Delete operating hours
+        await queryDB('DELETE FROM OperatingHours WHERE space_id = ?', [spaceId]);
+
+        // Delete space rules
+        await queryDB('DELETE FROM SpaceRules WHERE space_id = ?', [spaceId]);
+
+        // Finally delete the space
+        await queryDB('DELETE FROM Spaces WHERE space_id = ?', [spaceId]);
+
+        return { success: true, message: 'Space and all related data deleted successfully' };
+    } catch (error) {
+        throw new Error(`Error deleting space: ${error.message}`);
+    }
+}
+
+app.delete('/api/spaces', async (req, res) => {
+    const { id } = req.body;
+
+    if (!id) {
+        return res.status(400).json({ error: "Missing ID Field" });
+    }
+
+    try {
+        const result = await deleteSpace(id);
+        res.json(result);
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
 
 // SPACE ALTER METHOD here
 
@@ -377,7 +454,7 @@ app.post('/api/reservations', (req, res) => {
 });
 
 // RESERVATIONS GET METHOD
-app.get('/api/reservations/', (req, res) => {
+app.get('/api/reservations', (req, res) => {
     const query = `
         SELECT CONCAT(u.first_name, " ", u.last_name) AS name, s.space_name, r.reservation_id,
             r.start_time, r.end_time, r.status, r.created_at, r.modified_at,
@@ -386,8 +463,8 @@ app.get('/api/reservations/', (req, res) => {
         FROM Reservations r
         JOIN Spaces s ON r.space_id = s.space_id
         JOIN Users u ON r.user_id = u.user_id
-        LEFT JOIN Users cb ON r.created_by = cb.user_id -- Join for created_by user's name
-        LEFT JOIN Users lmb ON r.last_modified_by = lmb.user_id -- Join for last_modified_by user's name
+        LEFT JOIN Users cb ON r.created_by = cb.user_id
+        LEFT JOIN Users lmb ON r.last_modified_by = lmb.user_id
     `;
     db.query(query, (err, results) => {
         if (err) {
@@ -398,7 +475,57 @@ app.get('/api/reservations/', (req, res) => {
     });
 });
 
+// Get reservations for a specific space within a date range
+app.get('/api/reservations/space/:spaceId', (req, res) => {
+    const { spaceId } = req.params;
+    const { start, end } = req.query;
+
+    const query = `
+        SELECT r.reservation_id, r.space_id, r.start_time, r.end_time, r.status,
+            CONCAT(u.first_name, ' ', u.last_name) as user_name
+        FROM Reservations r
+        JOIN Users u ON r.user_id = u.user_id
+        WHERE r.space_id = ?
+        AND r.start_time >= ?
+        AND r.end_time <= ?
+        AND r.status != 'cancelled'
+        ORDER BY r.start_time
+    `;
+
+    db.query(query, [spaceId, start, end], (err, results) => {
+        if (err) {
+            res.status(500).json({ error: err.message });
+        } else {
+            res.json(results);
+        }
+    });
+});
+
 // RESERVATIONS DELETE METHOD
+
+async function deleteReservation(reservationId) {
+    try {
+        await queryDB('DELETE FROM Reservations WHERE reservation_id = ?', [reservationId]);
+        return { success: true, message: 'Reservation deleted successfully' };
+    } catch (error) {
+        throw new Error(`Error deleting reservation: ${error.message}`);
+    }
+}
+
+app.delete('/api/reservations', async (req, res) => {
+    const { id } = req.body;
+
+    if (!id) {
+        return res.status(400).json({ error: "Missing ID Field" });
+    }
+
+    try {
+        const result = await deleteReservation(id);
+        res.json(result);
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
 
 // RESERVATIONS ALTER METHOD
 app.patch('/api/reservations/:reservationId', (req, res) => {
