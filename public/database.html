@@ -9,18 +9,26 @@
     </head>
     <body>
         <!-- Header Section with Auth Controls -->
-        <div class="headerSection">
-            <!-- Container for logged-in user -->
-            <div id="userHeader">
-                <span id="welcomeMessage"></span>
-                <button onclick="handleLogout()" class="delete">Logout</button>
-            </div>
-
-            <!-- Container for login/signup button -->
-            <div id="loginHeader">
-                <button onclick="window.location.href='/'" class="submit">Login / Sign Up</button>
-            </div>
-        </div>
+        <header class="main-header">
+            <nav class="nav-container">
+                <div class="logo">
+                    Space Manager
+                </div>
+                <ul class="nav-links">
+                    <li><a href="/reservation.html">Make a Reservation</a></li>
+                    <li><a href="/createspace.html">Create a Space</a></li>
+                </ul>
+                <div class="auth-section">
+                    <div id="userHeader">
+                        <span id="welcomeMessage"></span>
+                        <button onclick="handleLogout()" class="logout-btn">Logout</button>
+                    </div>
+                    <div id="loginHeader">
+                        <button onclick="window.location.href='/login.html'" class="login-btn">Login / Sign Up</button>
+                    </div>
+                </div>
+            </nav>
+        </header>
         <h1>Users</h1>
         <table>
             <thead>
