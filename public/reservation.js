@@ -9,10 +9,24 @@ let existingReservations = [];
 let selectedTimeSlot = null;
 
 document.addEventListener('DOMContentLoaded', () => {
+    console.log('DOM Content Loaded');
     checkUserSession();
     loadSpaces();
 
-    document.getElementById('spaceSelect').addEventListener('change', handleSpaceSelection);
+    // Debug: Check if the element exists
+    const spaceSelect = document.getElementById('spaceSelect');
+    console.log('Space Select Element:', spaceSelect);
+
+    if (spaceSelect) {
+        console.log('Adding change event listener to spaceSelect');
+        spaceSelect.addEventListener('change', (event) => {
+            console.log('Space selection changed!'); // This will tell us if the event fires
+            handleSpaceSelection(event);
+        });
+    } else {
+        console.error('spaceSelect element not found!');
+    }
+
     document.getElementById('reservationForm').addEventListener('submit', handleReservationSubmit);
 });
 
@@ -67,44 +81,66 @@ async function handleSpaceSelection(event) {
         document.getElementById('spaceDetails').style.display = 'none';
         document.getElementById('reservationForm').style.display = 'none';
 
-        // Load space details, rules, and operating hours
-        const [space, rules, hours] = await Promise.all([
-            fetch(`/api/spaces/${spaceId}`).then(r => r.json()),
-            fetch(`/api/space-rules/${spaceId}`).then(r => r.json()),
-            fetch(`/api/operating-hours/${spaceId}`).then(r => r.json())
-        ]);
+        // Fetch and log each response
+        const spaceResponse = await fetch(`/api/spaces/${spaceId}`);
+        const space = await spaceResponse.json();
+        console.log('Space Response:', space);
 
-        console.log('Space details:', space);  // Debug log
-        console.log('Space rules:', rules);    // Debug log
-        console.log('Operating hours:', hours); // Debug log
+        const rulesResponse = await fetch(`/api/space-rules/${spaceId}`);
+        const rules = await rulesResponse.json();
+        console.log('Rules Response:', rules);
 
-        // Store the data globally
+        // Log specific rule values
+        console.log('Rule Values:', {
+            min_duration: rules.min_duration_minutes,
+            max_duration: rules.max_duration_minutes,
+            min_notice: rules.min_notice_hours,
+            max_advance: rules.max_advance_days
+        });
+
+        const hoursResponse = await fetch(`/api/operating-hours/${spaceId}`);
+        const hours = await hoursResponse.json();
+        console.log('Hours Response:', hours);
+
+        // Store data globally
         selectedSpace = space;
         spaceRules = rules;
         operatingHours = hours;
 
-        // Update the space details section
-        if (space) {
-            const detailsSection = document.getElementById('spaceDetails');
-            detailsSection.innerHTML = `
-                <h2>Space Details</h2>
-                <div class="details-grid">
-                    <div>Space Name: <span class="detail-value">${space.space_name}</span></div>
-                    <div>Host: <span class="detail-value">${space.host_name}</span></div>
-                    <div>Capacity: <span class="detail-value">${space.capacity} people</span></div>
-                    <div>Description: <span class="detail-value">${space.description}</span></div>
-                    ${rules ? `
-                        <div>Minimum Duration: <span class="detail-value">${rules.min_duration_minutes} minutes</span></div>
-                        <div>Maximum Duration: <span class="detail-value">${rules.max_duration_minutes} minutes</span></div>
-                        <div>Minimum Notice: <span class="detail-value">${rules.min_notice_hours} hours</span></div>
-                        <div>Max Advance Booking: <span class="detail-value">${rules.max_advance_days} days</span></div>
-                    ` : ''}
-                </div>
-            `;
-            detailsSection.style.display = 'block';
-        }
+        console.log('Global State Updates:', {
+            selectedSpace,
+            spaceRules,
+            operatingHours
+        });
 
-        // Initialize and display calendar
+        // Update display
+        const detailsSection = document.getElementById('spaceDetails');
+
+        // Log the rules object right before template literal
+        console.log('Rules object before template:', rules);
+
+        const templateHTML = `
+            <h2>Space Details</h2>
+            <div class="details-grid">
+                <div>Space Name: <span class="detail-value">${space.space_name}</span></div>
+                <div>Host: <span class="detail-value">${space.host_name}</span></div>
+                <div>Capacity: <span class="detail-value">${space.capacity} people</span></div>
+                <div>Description: <span class="detail-value">${space.description}</span></div>
+                ${rules ? `
+                    <div>Minimum Duration: <span class="detail-value">${rules.min_duration_minutes} minutes</span></div>
+                    <div>Maximum Duration: <span class="detail-value">${rules.max_duration_minutes} minutes</span></div>
+                    <div>Minimum Notice: <span class="detail-value">${rules.min_notice_hours} hours</span></div>
+                    <div>Max Advance Booking: <span class="detail-value">${rules.max_advance_days} days</span></div>
+                ` : ''}
+            </div>
+        `;
+
+        console.log('Generated HTML:', templateHTML);
+
+        detailsSection.innerHTML = templateHTML;
+        detailsSection.style.display = 'block';
+
+        // Initialize calendar and show form
         initializeCalendar();
         loadReservations();
         document.getElementById('reservationForm').style.display = 'block';

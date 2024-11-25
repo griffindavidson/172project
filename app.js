@@ -223,24 +223,48 @@ app.get('/api/spaces', (req, res) => {
 
 // Get specific space details
 app.get('/api/spaces/:id', (req, res) => {
-    const query = `
-        SELECT s.space_id, s.host_id, s.space_name, s.description, s.capacity, s.is_approved,
-            s.created_at, s.modified_at,
-            CONCAT(u.first_name, ' ', u.last_name) as host_name
-        FROM Spaces s
-        JOIN Users u ON s.host_id = u.user_id
-        WHERE s.space_id = ?
-    `;
+    if (isReservationRequest(req)) {
+        // Specific query for reservation page
+        const query = `
+            SELECT s.*, CONCAT(u.first_name, ' ', u.last_name) as host_name,
+                   sr.min_duration_minutes, sr.max_duration_minutes,
+                   sr.min_notice_hours, sr.max_advance_days
+            FROM Spaces s
+            JOIN Users u ON s.host_id = u.user_id
+            LEFT JOIN SpaceRules sr ON s.space_id = sr.space_id
+            WHERE s.space_id = ?
+        `;
 
-    db.query(query, [req.params.id], (err, results) => {
-        if (err) {
-            res.status(500).json({ error: err.message });
-        } else if (results.length === 0) {
-            res.status(404).json({ error: 'Space not found' });
-        } else {
-            res.json(results[0]);
-        }
-    });
+        db.query(query, [req.params.id], (err, results) => {
+            if (err) {
+                res.status(500).json({ error: err.message });
+            } else if (results.length === 0) {
+                res.status(404).json({ error: 'Space not found' });
+            } else {
+                res.json(results[0]);
+            }
+        });
+    } else {
+        // Original query for other pages
+        const query = `
+            SELECT s.space_id, s.host_id, s.space_name, s.description, s.capacity, s.is_approved,
+                s.created_at, s.modified_at,
+                CONCAT(u.first_name, ' ', u.last_name) as host_name
+            FROM Spaces s
+            JOIN Users u ON s.host_id = u.user_id
+            WHERE s.space_id = ?
+        `;
+
+        db.query(query, [req.params.id], (err, results) => {
+            if (err) {
+                res.status(500).json({ error: err.message });
+            } else if (results.length === 0) {
+                res.status(404).json({ error: 'Space not found' });
+            } else {
+                res.json(results[0]);
+            }
+        });
+    }
 });
 
 // SPACE DELETE METHOD here
@@ -269,23 +293,43 @@ app.post('/api/operating-hours', (req, res) => {
 });
 
 // OPERATING HOURS GET METHOD
-app.get('/api/operating-hours', (req, res) => {
-    const query = `
-        SELECT o.space_id, o.day_of_week, o.open_time, o.close_time, o.is_closed, s.space_name
-        FROM OperatingHours o
-        JOIN Spaces s ON s.space_id = o.space_id
-        ORDER BY s.space_name, o.day_of_week
-    `;
+app.get('/api/operating-hours/:id', (req, res) => {
+    if (isReservationRequest(req)) {
+        // Specific query for reservation page
+        const query = `
+            SELECT oh.*, s.space_name
+            FROM OperatingHours oh
+            JOIN Spaces s ON s.space_id = oh.space_id
+            WHERE oh.space_id = ?
+            ORDER BY oh.day_of_week
+        `;
 
-    db.query(query, (err, results) => {
-        if (err) {
-            console.log("Error fetching operating hours:", err);
-            res.status(500).json({ error: err.message });
-        } else {
+        db.query(query, [req.params.id], (err, results) => {
+            if (err) {
+                res.status(500).json({ error: err.message });
+            } else {
+                res.json(results);
+            }
+        });
+    } else {
+        // Original query for other pages
+        const query = `
+            SELECT o.space_id, o.day_of_week, o.open_time, o.close_time, o.is_closed, s.space_name
+            FROM OperatingHours o
+            JOIN Spaces s ON s.space_id = o.space_id
+            WHERE o.space_id = ?
+            ORDER BY s.space_name, o.day_of_week
+        `;
+
+        db.query(query, [req.params.id], (err, results) => {
+            if (err) {
+                res.status(500).json({ error: err.message });
+            } else {
 //            console.log("Operating hours results:", results); // Debug log it worx now
-            res.json(results);
-        }
-    });
+                res.json(results);
+            }
+        });
+    }
 });
 
 // OPERATING HOURS DELETE METHOD
@@ -419,19 +463,45 @@ app.post('/api/space-rules', (req, res) => {
 });
 
 // SPACE RULES GET METHOD
-app.get('/api/space-rules', (req, res) => {
-    const query = `
-        SELECT sr.space_id, s.space_name, sr.min_duration_minutes, sr.max_duration_minutes, sr.created_at, sr.modified_at
-        FROM SpaceRules sr
-        JOIN Spaces s ON s.space_id = sr.space_id
-    `;
-    db.query(query, (err, results) => {
-        if (err) {
-            res.status(500).json({ error: err.message });
-        } else {
-            res.json(results);
-        }
-    });
+app.get('/api/space-rules/:id', (req, res) => {
+    if (isReservationRequest(req)) {
+        // Specific query for reservation page
+        const query = `
+            SELECT sr.*, s.space_name
+            FROM SpaceRules sr
+            JOIN Spaces s ON s.space_id = sr.space_id
+            WHERE sr.space_id = ?
+        `;
+
+        db.query(query, [req.params.id], (err, results) => {
+            if (err) {
+                res.status(500).json({ error: err.message });
+            } else if (results.length === 0) {
+                res.status(404).json({ error: 'Space rules not found' });
+            } else {
+                res.json(results[0]);
+            }
+        });
+    } else {
+        // Original query for other pages
+        const query = `
+            SELECT sr.space_id, s.space_name, sr.min_duration_minutes, sr.max_duration_minutes,
+                   sr.created_at, sr.modified_at
+            FROM SpaceRules sr
+            JOIN Spaces s ON s.space_id = sr.space_id
+            WHERE sr.space_id = ?
+        `;
+
+        db.query(query, [req.params.id], (err, results) => {
+            if (err) {
+                res.status(500).json({ error: err.message });
+            } else if (results.length === 0) {
+                res.status(404).json({ error: 'Space rules not found' });
+            } else {
+                res.json(results[0]);
+            }
+        });
+    }
 });
 
 // SPACE RULES DELETE METHOD
@@ -443,3 +513,9 @@ app.get('/api/space-rules', (req, res) => {
 app.listen(PORT, () => {
     console.log(`Server running on http://localhost:${PORT}`);
 });
+
+// Helper function to check if request is from reservation page
+function isReservationRequest(req) {
+    const referer = req.get('Referer') || '';
+    return referer.includes('reservation.html');
+}
