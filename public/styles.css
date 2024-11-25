@@ -476,7 +476,6 @@ button {
     background-color: var(--root-background-color);
     color: var(--font-color);
     cursor: pointer;
-    color:white
 }
 
 .calendar-container {
