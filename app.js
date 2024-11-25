@@ -221,6 +221,28 @@ app.get('/api/spaces', (req, res) => {
     });
 });
 
+// Get specific space details
+app.get('/api/spaces/:id', (req, res) => {
+    const query = `
+        SELECT s.space_id, s.host_id, s.space_name, s.description, s.capacity, s.is_approved,
+            s.created_at, s.modified_at,
+            CONCAT(u.first_name, ' ', u.last_name) as host_name
+        FROM Spaces s
+        JOIN Users u ON s.host_id = u.user_id
+        WHERE s.space_id = ?
+    `;
+
+    db.query(query, [req.params.id], (err, results) => {
+        if (err) {
+            res.status(500).json({ error: err.message });
+        } else if (results.length === 0) {
+            res.status(404).json({ error: 'Space not found' });
+        } else {
+            res.json(results[0]);
+        }
+    });
+});
+
 // SPACE DELETE METHOD here
 
 // SPACE ALTER METHOD here
