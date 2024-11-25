@@ -249,7 +249,10 @@ async function deleteUser(id) {
         if (response.ok) {
             console.log("User deleted successfully:", id);
             const rowToDelete = document.querySelector(`button[data-id="${id}"]`).closest('tr');
-            if (rowToDelete) rowToDelete.remove();
+            if (rowToDelete) {
+                rowToDelete.remove();
+                location.reload();
+            }
         } else {
             console.error("Failed to delete user:", await response.text());
         }
@@ -270,7 +273,10 @@ async function deleteSpace(id) {
         if (response.ok) {
             console.log("Space deleted successfully:", id);
             const rowToDelete = document.querySelector(`button[data-id="${id}"]`).closest('tr');
-            if (rowToDelete) rowToDelete.remove();
+            if (rowToDelete) {
+                rowToDelete.remove();
+                location.reload();
+            }
         } else {
             console.error("Failed to delete space:", await response.text());
         }
@@ -291,7 +297,10 @@ async function deleteReservation(id) {
         if (response.ok) {
             console.log("Reservation deleted successfully:", id);
             const rowToDelete = document.querySelector(`button[data-id="${id}"]`).closest('tr');
-            if (rowToDelete) rowToDelete.remove();
+            if (rowToDelete) {
+                rowToDelete.remove();
+                location.reload();
+            }
         } else {
             console.error("Failed to delete reservation:", await response.text());
         }
@@ -312,7 +321,10 @@ async function deleteSpaceRule(id) {
         if (response.ok) {
             console.log("Space rule deleted successfully:", id);
             const rowToDelete = document.querySelector(`button[data-id="${id}"]`).closest('tr');
-            if (rowToDelete) rowToDelete.remove();
+            if (rowToDelete) {
+                rowToDelete.remove();
+                location.reload();
+            }
         } else {
             console.error("Failed to delete space rule:", await response.text());
         }
@@ -367,7 +379,10 @@ async function deleteOperatingHours(spaceId, day) {
 
         if (response.ok) {
             const rowToDelete = document.querySelector(`button[data-space-id="${spaceId}"][data-day="${day}"]`).closest('tr');
-            if (rowToDelete) rowToDelete.remove();
+            if (rowToDelete) {
+                rowToDelete.remove();
+                location.reload();
+            }
         } else {
             console.error("Failed to delete operating hours:", await response.text());
         }

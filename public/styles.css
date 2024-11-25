@@ -281,7 +281,7 @@ button {
     left: 20px;
     width: 400px;
     height: 100px;
-    background-color: #cc3333;
+    background-color: #ff4444;
     border-radius: 20px;
     display: flex;
     flex-direction: column;
@@ -609,8 +609,6 @@ button {
     background-color: var(--root-background-color);
 }
 
-const styleSheet = document.createElement("style");
-styleSheet.textContent = `
 .modal-overlay {
     display: none;
     position: fixed;
@@ -635,6 +633,10 @@ styleSheet.textContent = `
     width: 90%;
     max-height: 90vh;
     overflow-y: auto;
+}
+
+div {
+    color: var(--font-color);
 }
 
 .modal h2 {
@@ -682,5 +684,13 @@ styleSheet.textContent = `
     background-color: #f44336;
     color: white;
 }
-`;
-document.head.appendChild(styleSheet);
+
+header {
+    position: fixed;
+    background-color: rgba(var(--th-background-color), 0.1);
+    backdrop-filter: blur(15px);
+}
+
+.top {
+    padding-top: 100px;
+}
