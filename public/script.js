@@ -256,3 +256,24 @@ function formatDateTime(isoString) {
 
     return formattedDate;
 }
+
+async function handleLogout() {
+    try {
+        const response = await fetch('/api/logout', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            credentials: 'include',
+        });
+
+        if (!response.ok) {
+            throw new Error('Failed to logout!');
+        }
+
+        const data = await response.json();
+        window.location.href = '/login';
+    } catch (error) {
+        console.error('Logout error', error);
+    }
+}

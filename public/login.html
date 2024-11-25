@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login/Signup</title>
-    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="./styles.css">
     <style>
         .auth-container {
             max-width: 400px;
@@ -55,6 +55,13 @@
         .checkbox-group input {
             width: auto;
         }
+
+        .button-container {
+            width: 100%;
+            text-align: center;
+            margin: 0;
+            padding: 0;
+        }
     </style>
 </head>
 <body>
@@ -70,7 +77,9 @@
                 <label for="loginPassword">Password:</label>
                 <input type="password" id="loginPassword" required>
             </div>
-            <button type="submit" class="submit">Login</button>
+            <div class="button-container">
+                <button type="submit" class="submit">Login</button>
+            </div>
         </form>
         <div class="toggle-form">
             Don't have an account? <a onclick="toggleForms()">Sign up</a>
