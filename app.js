@@ -312,6 +312,9 @@ app.get('/api/operating-hours/:id', (req, res) => {
                 res.json(results);
             }
         });
+    } else {
+        res.status(400).json({ error: 'Invalid request' });
+    }
 });
 
 // OPERATING HOURS DELETE METHOD
