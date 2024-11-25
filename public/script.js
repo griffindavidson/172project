@@ -130,7 +130,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         <td>${openTime}</td>
                         <td>${closeTime}</td>
                         <td>
-                            <button class="delete" data-id="${operation.operating_hours_id}">Delete</button>
+                            <button class="delete" data-space-id="${operation.space_id}" data-day="${operation.day_of_week}">Delete</button>
                             <button class="edit">Edit</button>
                         </td>
                     `;
@@ -257,10 +257,37 @@ async function deleteUser(id) {
 function attachDeleteListeners() {
     document.querySelectorAll('.delete').forEach(button => {
         button.addEventListener('click', () => {
-            const id = button.getAttribute('data-id');
-            deleteUser(id);
+            // Check if this is an operating hours delete button
+            if (button.hasAttribute('data-space-id') && button.hasAttribute('data-day')) {
+                const spaceId = button.getAttribute('data-space-id');
+                const day = button.getAttribute('data-day');
+                deleteOperatingHours(spaceId, day);
+            } else {
+                const id = button.getAttribute('data-id');
+                deleteUser(id);
+            }
         });
     });
+}
+
+// Handle Operating Hours Deletion
+async function deleteOperatingHours(spaceId, day) {
+    try {
+        const response = await fetch('/api/operating-hours', {
+            method: 'DELETE',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ spaceId, day }),
+        });
+
+        if (response.ok) {
+            const rowToDelete = document.querySelector(`button[data-space-id="${spaceId}"][data-day="${day}"]`).closest('tr');
+            if (rowToDelete) rowToDelete.remove();
+        } else {
+            console.error("Failed to delete operating hours:", await response.text());
+        }
+    } catch (error) {
+        console.error("Error in deleteOperatingHours:", error);
+    }
 }
 
 function formatDateTime(isoString) {
@@ -334,10 +361,10 @@ function animateWarning() {
 
     element.innerHTML = `
         <div class="warning">
-            <p class="warning-title">Error!</p>
-            <p class="warning-body">
                 You cannot delete yourself while logged in!
             </p>
+            <p class="warning-title">Error!</p>
+            <p class="warning-body">
         </div>
     `;
 

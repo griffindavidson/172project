@@ -36,8 +36,7 @@ CREATE TABLE OperatingHours (
     CONSTRAINT fk_operatinghours_space
         FOREIGN KEY (space_id)
         REFERENCES Spaces(space_id)
-        ON DELETE CASCADE,
-    UNIQUE(space_id, day_of_week)
+        ON DELETE CASCADE
 );
 
 -- Reservations table to store bookings

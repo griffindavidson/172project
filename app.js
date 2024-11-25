@@ -249,20 +249,45 @@ app.post('/api/operating-hours', (req, res) => {
 // OPERATING HOURS GET METHOD
 app.get('/api/operating-hours', (req, res) => {
     const query = `
-        SELECT o.operating_hours_id, s.space_name, o.day_of_week, o.open_time, o.close_time
+        SELECT o.space_id, o.day_of_week, o.open_time, o.close_time, o.is_closed, s.space_name
         FROM OperatingHours o
         JOIN Spaces s ON s.space_id = o.space_id
+        ORDER BY s.space_name, o.day_of_week
     `;
+
     db.query(query, (err, results) => {
         if (err) {
-            res.status(500).json( { error: err.message });
+            console.log("Error fetching operating hours:", err);
+            res.status(500).json({ error: err.message });
         } else {
+//            console.log("Operating hours results:", results); // Debug log it worx now
             res.json(results);
         }
     });
 });
 
 // OPERATING HOURS DELETE METHOD
+app.delete('/api/operating-hours', (req, res) => {
+    const { spaceId, day } = req.body;
+
+    if (!spaceId || day === undefined) {
+        return res.status(400).json({ error: "Missing space ID or day" });
+    }
+
+    const query = 'DELETE FROM OperatingHours WHERE space_id = ? AND day_of_week = ?';
+    db.query(query, [spaceId, day], (err, results) => {
+        if (err) {
+            console.error("Database Error:", err);
+            return res.status(500).json({ error: "Internal Server Error" });
+        }
+
+        if (results.affectedRows > 0) {
+            res.json({ message: "Operating hours deleted successfully" });
+        } else {
+            res.status(404).json({ error: "Operating hours not found" });
+        }
+    });
+});
 
 // OPERATING HOURS ALTER METHOD
 
