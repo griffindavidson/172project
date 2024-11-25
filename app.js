@@ -18,15 +18,10 @@ app.use(session({
 app.use(bodyParser.json());
 app.use(express.static('public'));
 
-// Test Route
-app.get('/', (req, res) => {
-    res.send('Welcome to the Node.js Website!');
-});
-
 // Login Page
 
-app.get('/login', (req, res) => {
-    res.sendFile(__dirname + '/public/login.html');
+app.get('/', (req, res) => {
+    res.sendFile(__dirname + '/public/index.html');
 });
 
 // Login route
@@ -164,20 +159,27 @@ app.delete('/api/Users', (req, res) => {
         return res.status(400).send("Missing ID Field");
     }
 
+    // Ensure the logged-in user is not deleting their own account
+    const loggedInUserId = req.session.user?.id; // Fetch from session
+    if (parseInt(id, 10) === parseInt(loggedInUserId, 10)) {
+        return res.status(403).send({ error: "You cannot delete your own account while logged in." });
+    }
+
     const query = 'DELETE FROM Users WHERE user_id = ?';
     db.query(query, [id], (err, results) => {
         if (err) {
             console.log("Database Error:", err);
-            return res.status(500).send({ error: "Internal Server Error"});
+            return res.status(500).send({ error: "Internal Server Error" });
         }
 
         if (results.affectedRows > 0) {
-            res.status(200).send({ message: "User deleted sucessfully" });
+            res.status(200).send({ message: "User deleted successfully" });
         } else {
             res.status(404).send({ error: "User not found" });
         }
     });
 });
+
 
 // need to add a USER ALTER METHOD here
 

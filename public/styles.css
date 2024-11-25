@@ -178,3 +178,44 @@ button {
     align-items: center;
     justify-content: center;
 }
+
+/* Wrapper styling */
+.warning-wrapper {
+    position: fixed;
+    bottom: 20px;
+    left: 20px;
+    width: 400px;
+    height: 100px;
+    background-color: #cc3333;
+    border-radius: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    opacity: 0; /* Start hidden */
+    transform: translateY(50px) scale(90%); /* Start moved down */
+    transition: opacity 0.3s ease-out, transform 0.3s ease-out;
+}
+
+/* Visible state */
+.visible {
+    opacity: 1;
+    transform: translateY(0) scale(100%); /* Move to normal position */
+}
+
+/* Hidden-out state for animating out */
+.hidden-out {
+    opacity: 0;
+    transform: translateY(50px) scale(90%); /* Move back down */
+    transition: opacity 0.5s ease-in, transform 0.5s ease-in;
+}
+
+.warning {
+    color: white;
+}
+
+.warning > .warning-title {
+    font-weight: bolder;
+    font-size: 1.5rem;
+    text-align: center;
+}

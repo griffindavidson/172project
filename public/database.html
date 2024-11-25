@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang='en'>
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>CMPE172 Project</title>
+        <link rel="stylesheet" type="text/css" href="./styles.css">
+        <script type="text/javascript" src="./script.js" defer></script>
+    </head>
+    <body>
+        <!-- Header Section with Auth Controls -->
+        <div class="headerSection">
+            <!-- Container for logged-in user -->
+            <div id="userHeader">
+                <span id="welcomeMessage"></span>
+                <button onclick="handleLogout()" class="delete">Logout</button>
+            </div>
+
+            <!-- Container for login/signup button -->
+            <div id="loginHeader">
+                <button onclick="window.location.href='/'" class="submit">Login / Sign Up</button>
+            </div>
+        </div>
+
+        <button onClick="animateWarning()">Test Warning</button>
+
+        <h1>Users</h1>
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>First Name</th>
+                    <th>Last Name</th>
+                    <th>Email</th>
+                    <th>Host Privilages</th>
+                    <th>Created</th>
+                    <th>Options</th>
+                </tr>
+            </thead>
+            <tbody id="dynamic-content-users"></tbody>
+        </table>
+
+        <h1>Spaces</h1>
+        <table>
+            <thead>
+                <tr>
+                    <th>Host</th>
+                    <th>Name</th>
+                    <th>Description</th>
+                    <th>Capacity</th>
+                    <th>Approval</th>
+                    <th>Created</th>
+                    <th>Modified</th>
+                    <th>Options</th>
+                </tr>
+            </thead>
+            <tbody id="dynamic-content-spaces"></tbody>
+        </table>
+
+        <h1>Operating Hours</h1>
+        <table>
+            <thead>
+                <tr>
+                    <th>Space Name</th>
+                    <th>Day</th>
+                    <th>Opens</th>
+                    <th>Closes</th>
+                    <th>Options</th>
+                </tr>
+            </thead>
+            <tbody id="dynamic-content-operating"></tbody>
+        </table>
+
+        <h1>Reservations</h1>
+        <table>
+            <thead>
+                <tr>
+                    <th>Reservee Name</th>
+                    <th>Space</th>
+                    <th>Start Time</th>
+                    <th>End Time</th>
+                    <th>Status</th>
+                    <th>Created</th>
+                    <th>Modified</th>
+                    <th>Created By</th>
+                    <th>Last Modified By</th>
+                    <th>Options</th>
+                </tr>
+            </thead>
+            <tbody id="dynamic-content-reservations"></tbody>
+        </table>
+
+        <h1>Space Rules</h1>
+        <table>
+            <thead>
+                <tr>
+                    <th>Space</th>
+                    <th>Minimum Duration</th>
+                    <th>Maximum Duration</th>
+                    <th>Created</th>
+                    <th>Modified</th>
+                    <th>Options</th>
+                </tr>
+            </thead>
+            <tbody id="dynamic-content-rules"></tbody>
+        </table>
+    </body>
+</html>

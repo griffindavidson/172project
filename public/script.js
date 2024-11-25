@@ -83,7 +83,9 @@ document.addEventListener('DOMContentLoaded', () => {
             });
             attachDeleteListeners();
         })
-        .catch(error => { console.error("Error fetching Spaces", error) });
+        .catch(error => {
+            console.error("Error fetching Spaces", error)
+        });
 
     // get operating hours table
     fetch('/api/operating-hours')
@@ -106,7 +108,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 function formatTime(inputTime) {
                     const [hours, minutes] = inputTime.split(":");
                     const date = new Date();
-                    date.setHours(parseInt(hours, 10), parseInt(minutes,10));
+                    date.setHours(parseInt(hours, 10), parseInt(minutes, 10));
 
                     let formatter = Intl.DateTimeFormat('en-US', {
                         hour: 'numeric',
@@ -120,9 +122,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 const openTime = formatTime(operation.open_time);
                 const closeTime = formatTime(operation.close_time);
 
-                    const row = document.createElement('tr');
+                const row = document.createElement('tr');
 
-                    row.innerHTML = `
+                row.innerHTML = `
                         <td>${operation.space_name}</td>
                         <td>${weekday[operation.day_of_week]}</td>
                         <td>${openTime}</td>
@@ -132,28 +134,30 @@ document.addEventListener('DOMContentLoaded', () => {
                             <button class="edit">Edit</button>
                         </td>
                     `;
-                    tableBody.appendChild(row);
-                });
-                attachDeleteListeners();
-            })
-            .catch(error => { console.error("Error fetching Operating Hours", error) });
+                tableBody.appendChild(row);
+            });
+            attachDeleteListeners();
+        })
+        .catch(error => {
+            console.error("Error fetching Operating Hours", error)
+        });
 
-        // grab reservations table
-        fetch('/api/reservations')
-            .then(response => response.json())
-            .then(data => {
+    // grab reservations table
+    fetch('/api/reservations')
+        .then(response => response.json())
+        .then(data => {
 
-                const tableBody = document.getElementById('dynamic-content-reservations');
+            const tableBody = document.getElementById('dynamic-content-reservations');
 
-                // clear any extraenous innerHTML
-                tableBody.innerHTML = '';
+            // clear any extraenous innerHTML
+            tableBody.innerHTML = '';
 
-                // populate rows
-                data.forEach(reservation => {
+            // populate rows
+            data.forEach(reservation => {
 
-                    const row = document.createElement('tr');
+                const row = document.createElement('tr');
 
-                    row.innerHTML = `
+                row.innerHTML = `
                         <td>${reservation.name}</td>
                         <td>${reservation.space_name}</td>
                         <td>${formatDateTime(reservation.start_time)}</td>
@@ -168,28 +172,30 @@ document.addEventListener('DOMContentLoaded', () => {
                             <button class="edit">Edit</button>
                         </td>
                     `;
-                    tableBody.appendChild(row);
-                });
-                attachDeleteListeners();
-            })
-        .catch(error => { console.error("Error fetching Reservations", error) });
+                tableBody.appendChild(row);
+            });
+            attachDeleteListeners();
+        })
+        .catch(error => {
+            console.error("Error fetching Reservations", error)
+        });
 
-        // grab space rules
-        fetch('/api/space-rules')
-            .then(response => response.json())
-            .then(data => {
+    // grab space rules
+    fetch('/api/space-rules')
+        .then(response => response.json())
+        .then(data => {
 
-                const tableBody = document.getElementById('dynamic-content-rules')
+            const tableBody = document.getElementById('dynamic-content-rules')
 
-                // clear any potential innerHTML
-                tableBody.innerHTML = '';
+            // clear any potential innerHTML
+            tableBody.innerHTML = '';
 
-                // populate rows
-                data.forEach(rule => {
+            // populate rows
+            data.forEach(rule => {
 
-                    const row = document.createElement('tr');
+                const row = document.createElement('tr');
 
-                    row.innerHTML = `
+                row.innerHTML = `
                         <td>${rule.space_name}</td>
                         <td>${rule.min_duration_minutes}</td>
                         <td>${rule.max_duration_minutes}</td>
@@ -200,32 +206,52 @@ document.addEventListener('DOMContentLoaded', () => {
                             <button class="edit">Edit</button>
                         </td>
                     `;
-                    tableBody.appendChild(row);
-                });
-                attachDeleteListeners();
-            })
-        .catch(error => { console.error("Error fetching Space Rules", error) });
+                tableBody.appendChild(row);
+            });
+            attachDeleteListeners();
+        })
+        .catch(error => {
+            console.error("Error fetching Space Rules", error)
+        });
 });
 
-function deleteUser(id) {
-    fetch('/api/Users', {
-        method: 'DELETE',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ id })
-    })
-    .then(response => {
-        if (response.ok) {
-            // row removed on server, need to update DOM manually
-            const rowToDelete = document.querySelector(`button[data-id="${id}"`).closest('tr');
-            if (rowToDelete) {
-                rowToDelete.remove();
-            }
-        } else {
-            console.log("Failed to delete user");
+async function deleteUser(id) {
+    // Confirmation dialog before proceeding
+    try {
+        const loggedInId = await getLoggedInID();
+        if (!loggedInId) {
+            console.error("Cannot verify logged-in user. Aborting deletion.");
+            return;
         }
-    })
-    .catch(error => console.error("Error deleting user:", error));
+        if (parseInt(id, 10) === parseInt(loggedInId, 10)) {
+            console.warn("Cannot delete yourself while logged in!");
+            animateWarning();
+            return;
+        }
+
+        console.log("Deleting user:", id);
+        const response = await fetch('/api/Users', {
+            method: 'DELETE',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ id }),
+        });
+
+        if (response.ok) {
+            console.log("User deleted successfully:", id);
+            const rowToDelete = document.querySelector(`button[data-id="${id}"]`).closest('tr');
+            if (rowToDelete) rowToDelete.remove();
+        } else {
+            console.error("Failed to delete user:", await response.text());
+        }
+    } catch (error) {
+        console.error("Error in deleteUser:", error);
+    }
 }
+
+
+
+
+
 
 // run this function when adding new rows
 function attachDeleteListeners() {
@@ -233,8 +259,8 @@ function attachDeleteListeners() {
         button.addEventListener('click', () => {
             const id = button.getAttribute('data-id');
             deleteUser(id);
-        })
-    })
+        });
+    });
 }
 
 function formatDateTime(isoString) {
@@ -272,8 +298,66 @@ async function handleLogout() {
         }
 
         const data = await response.json();
-        window.location.href = '/login';
+        window.location.href = '/';
     } catch (error) {
         console.error('Logout error', error);
     }
+}
+
+function getLoggedInID() {
+    return fetch('/api/user-session')
+        .then(response => {
+            if (!response.ok) {
+                throw new Error("Failed to fetch user session");
+            }
+            return response.json(); // Parse the JSON
+        })
+        .then(user => {
+            if (user && user.id) {
+                return user.id; // Return the ID to the caller
+            } else {
+                console.log("ID is null?");
+                return null; // Explicitly return null if no ID
+            }
+        })
+        .catch(error => {
+            console.error("i give up", error);
+            return null; // Return null in case of an error
+        });
+}
+
+function animateWarning() {
+    const element = document.createElement('div');
+
+    element.classList.add('warning-wrapper');
+    element.classList.add('hidden'); // Start with the hidden class
+
+    element.innerHTML = `
+        <div class="warning">
+            <p class="warning-title">Error!</p>
+            <p class="warning-body">
+                You cannot delete yourself while logged in!
+            </p>
+        </div>
+    `;
+
+    // Append the element to the body
+    document.body.appendChild(element);
+
+    // Delay the removal of the "hidden" class to trigger the transition
+    setTimeout(() => {
+        element.classList.remove('hidden');
+        element.classList.add('visible');
+    }, 50); // Small delay to allow the initial styles to be applied
+
+    // Reverse the animation after 3 seconds
+    setTimeout(() => {
+        element.classList.remove('visible');
+        element.classList.add('hidden-out');
+
+        // Remove the element after the animation-out transition ends
+        setTimeout(() => {
+            element.remove();
+        }, 500); // Match the transition duration in CSS
+    }, 3000); // Stay visible for 3 seconds
 }
