@@ -134,3 +134,33 @@ VALUES
 (1, 30, 120, 30, 2, 24),
 (2, 60, 240, 60, 4, 48),
 (3, 15, 180, 14, 1, 12);
+
+-- Space 1: "Cozy Meeting Room" - Standard business hours with shorter weekend hours
+INSERT INTO OperatingHours (space_id, day_of_week, open_time, close_time, is_closed)
+VALUES
+-- Monday to Friday (0-4) standard business hours
+(1, 0, '08:00:00', '18:00:00', FALSE),  -- Monday
+(1, 1, '08:00:00', '18:00:00', FALSE),  -- Tuesday
+(1, 2, '08:00:00', '18:00:00', FALSE),  -- Wednesday
+(1, 3, '08:00:00', '18:00:00', FALSE),  -- Thursday
+(1, 4, '08:00:00', '18:00:00', FALSE),  -- Friday
+(1, 5, '09:00:00', '15:00:00', FALSE),  -- Saturday
+(1, 6, '09:00:00', '15:00:00', FALSE),  -- Sunday
+
+-- Space 2: "Large Conference Hall" - Extended hours for events
+(2, 0, '07:00:00', '22:00:00', FALSE),  -- Monday
+(2, 1, '07:00:00', '22:00:00', FALSE),  -- Tuesday
+(2, 2, '07:00:00', '22:00:00', FALSE),  -- Wednesday
+(2, 3, '07:00:00', '22:00:00', FALSE),  -- Thursday
+(2, 4, '07:00:00', '23:00:00', FALSE),  -- Friday
+(2, 5, '08:00:00', '23:00:00', FALSE),  -- Saturday
+(2, 6, '09:00:00', '20:00:00', FALSE),  -- Sunday
+
+-- Space 3: "Open Workspace" - Extended weekday hours, limited weekend availability
+(3, 0, '07:00:00', '20:00:00', FALSE),  -- Monday
+(3, 1, '07:00:00', '20:00:00', FALSE),  -- Tuesday
+(3, 2, '07:00:00', '20:00:00', FALSE),  -- Wednesday
+(3, 3, '07:00:00', '20:00:00', FALSE),  -- Thursday
+(3, 4, '07:00:00', '20:00:00', FALSE),  -- Friday
+(3, 5, '09:00:00', '17:00:00', FALSE),  -- Saturday
+(3, 6, NULL, NULL, TRUE);               -- Sunday (closed)
