@@ -225,6 +225,29 @@ async function deleteUserCascade(userId) {
 
 
 // need to add a USER ALTER METHOD here
+app.patch('/api/Users/:id', async (req, res) => {
+    const { id } = req.params;
+    const { first_name, last_name, email, is_host } = req.body;
+
+    try {
+        const query = `
+            UPDATE Users
+            SET first_name = ?, last_name = ?, email = ?, is_host = ?
+            WHERE user_id = ?
+        `;
+        const result = await queryDB(query, [first_name, last_name, email, is_host, id]);
+
+        if (result.affectedRows > 0) {
+            res.json({ message: 'User updated successfully' });
+        } else {
+            res.status(404).json({ error: 'User not found' });
+        }
+    } catch (err) {
+        console.error('Error updating user:', err);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+});
+
 
 // ======= Space Routes =======
 
@@ -348,6 +371,29 @@ app.delete('/api/spaces', async (req, res) => {
 });
 
 // SPACE ALTER METHOD here
+app.patch('/api/spaces/:id', async (req, res) => {
+    const { id } = req.params;
+    const { space_name, description, capacity, is_approved } = req.body;
+
+    try {
+        const query = `
+            UPDATE Spaces
+            SET space_name = ?, description = ?, capacity = ?, is_approved = ?,
+                modified_at = CURRENT_TIMESTAMP
+            WHERE space_id = ?
+        `;
+        const result = await queryDB(query, [space_name, description, capacity, is_approved, id]);
+
+        if (result.affectedRows > 0) {
+            res.json({ message: 'Space updated successfully' });
+        } else {
+            res.status(404).json({ error: 'Space not found' });
+        }
+    } catch (err) {
+        console.error('Error updating space:', err);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+});
 
 // ======= Operating Hours Routes =======
 
@@ -430,6 +476,28 @@ app.delete('/api/operating-hours', (req, res) => {
 });
 
 // OPERATING HOURS ALTER METHOD
+app.patch('/api/operating-hours/:spaceId/:day', async (req, res) => {
+    const { spaceId, day } = req.params;
+    const { open_time, close_time, is_closed } = req.body;
+
+    try {
+        const query = `
+            UPDATE OperatingHours
+            SET open_time = ?, close_time = ?, is_closed = ?
+            WHERE space_id = ? AND day_of_week = ?
+        `;
+        const result = await queryDB(query, [open_time, close_time, is_closed, spaceId, day]);
+
+        if (result.affectedRows > 0) {
+            res.json({ message: 'Operating hours updated successfully' });
+        } else {
+            res.status(404).json({ error: 'Operating hours not found' });
+        }
+    } catch (err) {
+        console.error('Error updating operating hours:', err);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+});
 
 // ======= Reservation Routes =======
 
@@ -528,23 +596,27 @@ app.delete('/api/reservations', async (req, res) => {
 });
 
 // RESERVATIONS ALTER METHOD
-app.patch('/api/reservations/:reservationId', (req, res) => {
+app.patch('/api/reservations/:id', async (req, res) => {
+    const { id } = req.params;
     const { status, last_modified_by } = req.body;
-    const query = `
-        UPDATE Reservations
-        SET status = ?, last_modified_by = ?, modified_at = CURRENT_TIMESTAMP
-        WHERE reservation_id = ?
-    `;
-    db.query(query, [status, last_modified_by, req.params.reservationId], (err, results) => {
-        if (err) {
-            res.status(500).json({ error: err.message });
+
+    try {
+        const query = `
+            UPDATE Reservations
+            SET status = ?, last_modified_by = ?, modified_at = CURRENT_TIMESTAMP
+            WHERE reservation_id = ?
+        `;
+        const result = await queryDB(query, [status, last_modified_by, id]);
+
+        if (result.affectedRows > 0) {
+            res.json({ message: 'Reservation updated successfully' });
         } else {
-            res.json({
-                message: 'Reservation updated successfully',
-                affected_rows: results.affectedRows
-            });
+            res.status(404).json({ error: 'Reservation not found' });
         }
-    });
+    } catch (err) {
+        console.error('Error updating reservation:', err);
+        res.status(500).json({ error: 'Internal server error' });
+    }
 });
 
 // ======= Space Rules Routes =======
@@ -628,6 +700,30 @@ app.get('/api/space-rules/:id', (req, res) => {
 // SPACE RULES DELETE METHOD
 
 // SPACE RULES ALTER METHOD
+
+app.patch('/api/space-rules/:id', async (req, res) => {
+    const { id } = req.params;
+    const { min_duration_minutes, max_duration_minutes } = req.body;
+
+    try {
+        const query = `
+            UPDATE SpaceRules
+            SET min_duration_minutes = ?, max_duration_minutes = ?,
+                modified_at = CURRENT_TIMESTAMP
+            WHERE space_id = ?
+        `;
+        const result = await queryDB(query, [min_duration_minutes, max_duration_minutes, id]);
+
+        if (result.affectedRows > 0) {
+            res.json({ message: 'Space rules updated successfully' });
+        } else {
+            res.status(404).json({ error: 'Space rules not found' });
+        }
+    } catch (err) {
+        console.error('Error updating space rules:', err);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+});
 
 // ======= Start Server =======
 
