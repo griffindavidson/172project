@@ -377,7 +377,7 @@ app.post('/api/reservations', (req, res) => {
 });
 
 // RESERVATIONS GET METHOD
-app.get('/api/reservations/', (req, res) => {
+app.get('/api/reservations', (req, res) => {
     const query = `
         SELECT CONCAT(u.first_name, " ", u.last_name) AS name, s.space_name, r.reservation_id,
             r.start_time, r.end_time, r.status, r.created_at, r.modified_at,
@@ -386,10 +386,36 @@ app.get('/api/reservations/', (req, res) => {
         FROM Reservations r
         JOIN Spaces s ON r.space_id = s.space_id
         JOIN Users u ON r.user_id = u.user_id
-        LEFT JOIN Users cb ON r.created_by = cb.user_id -- Join for created_by user's name
-        LEFT JOIN Users lmb ON r.last_modified_by = lmb.user_id -- Join for last_modified_by user's name
+        LEFT JOIN Users cb ON r.created_by = cb.user_id
+        LEFT JOIN Users lmb ON r.last_modified_by = lmb.user_id
     `;
     db.query(query, (err, results) => {
+        if (err) {
+            res.status(500).json({ error: err.message });
+        } else {
+            res.json(results);
+        }
+    });
+});
+
+// Get reservations for a specific space within a date range
+app.get('/api/reservations/space/:spaceId', (req, res) => {
+    const { spaceId } = req.params;
+    const { start, end } = req.query;
+
+    const query = `
+        SELECT r.reservation_id, r.space_id, r.start_time, r.end_time, r.status,
+            CONCAT(u.first_name, ' ', u.last_name) as user_name
+        FROM Reservations r
+        JOIN Users u ON r.user_id = u.user_id
+        WHERE r.space_id = ?
+        AND r.start_time >= ?
+        AND r.end_time <= ?
+        AND r.status != 'cancelled'
+        ORDER BY r.start_time
+    `;
+
+    db.query(query, [spaceId, start, end], (err, results) => {
         if (err) {
             res.status(500).json({ error: err.message });
         } else {

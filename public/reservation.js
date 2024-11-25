@@ -232,12 +232,20 @@ function loadReservations() {
     const endDate = new Date(currentWeekStart.getTime() + 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
 
     fetch(`/api/reservations/space/${selectedSpace.space_id}?start=${startDate}&end=${endDate}`)
-        .then(response => response.json())
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            return response.json();
+        })
         .then(reservations => {
             existingReservations = reservations;
             displayReservations();
         })
-        .catch(error => console.error('Error loading reservations:', error));
+        .catch(error => {
+            console.error('Error loading reservations:', error);
+            showMessage('Error loading reservations', 'error');
+        });
 }
 
 function displayReservations() {
