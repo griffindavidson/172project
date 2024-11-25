@@ -10,6 +10,8 @@
 4. Clone repository
 5. install required packages:
    -  `npm install express mysql2 dotenv body-parser`
+   -  `npm install express-session bcrypt`
+
 
 6. add .env file:
    ```

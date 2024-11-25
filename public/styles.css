@@ -141,3 +141,7 @@ button {
 .edit:active {
     background-color: lightgreen;
 }
+
+.checkbox-group label {
+    color: white;
+}
