@@ -9,13 +9,27 @@
   <script type="text/javascript" src="./reservation.js" defer></script>
 </head>
 <body>
-<div class="headerSection">
-  <div id="userHeader">
-    <span id="welcomeMessage"></span>
-    <button onclick="handleLogout()" class="delete">Logout</button>
-    <button onclick="window.location.href='/database.html'" class="submit">Back to Dashboard</button>
-  </div>
-</div>
+<!-- Header Section with Auth Controls -->
+<header class="main-header">
+  <nav class="nav-container">
+    <div class="logo">
+      Space Manager
+    </div>
+    <ul class="nav-links">
+      <li><a href="/database.html">Database Page</a></li>
+      <li><a href="/createspace.html">Create a Space</a></li>
+    </ul>
+    <div class="auth-section">
+      <div id="userHeader">
+        <span id="welcomeMessage"></span>
+        <button onclick="handleLogout()" class="logout-btn">Logout</button>
+      </div>
+      <div id="loginHeader">
+        <button onclick="window.location.href='/login.html'" class="login-btn">Login / Sign Up</button>
+      </div>
+    </div>
+  </nav>
+</header>
 
 <div class="reservation-container">
   <h1>Make a Reservation</h1>
