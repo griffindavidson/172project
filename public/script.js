@@ -49,8 +49,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 tableBody.appendChild(row);
             });
 
-            // Add click event listeners for delete buttons
+            // Add click event listeners for delete/edit buttons
             attachDeleteListeners();
+            attachEditListeners();
         })
         .catch(error => console.error('Error fetching Users: ', error));
 
@@ -82,6 +83,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 tableBody.appendChild(row);
             });
             attachDeleteListeners();
+            attachEditListeners();
         })
         .catch(error => {
             console.error("Error fetching Spaces", error)
@@ -142,6 +144,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 tableBody.appendChild(row);
             });
             attachDeleteListeners();
+            attachEditListeners();
         })
         .catch(error => {
             console.error("Error fetching Operating Hours", error)
@@ -180,6 +183,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 tableBody.appendChild(row);
             });
             attachDeleteListeners();
+            attachEditListeners();
         })
         .catch(error => {
             console.error("Error fetching Reservations", error)
@@ -214,6 +218,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 tableBody.appendChild(row);
             });
             attachDeleteListeners();
+            attachEditListeners();
         })
         .catch(error => {
             console.error("Error fetching Space Rules", error)
@@ -468,4 +473,169 @@ function animateWarning() {
             element.remove();
         }, 500); // Match the transition duration in CSS
     }, 3000); // Stay visible for 3 seconds
+}
+// EDIT HANDLERS
+async function editUser(row) {
+    const userId = row.querySelector('.delete').getAttribute('data-id');
+    const firstName = row.cells[1].textContent;
+    const lastName = row.cells[2].textContent;
+    const email = row.cells[3].textContent;
+    const isHost = row.cells[4].textContent === 'Yes';
+
+    const fields = `
+        <div class="form-group">
+            <label for="firstName">First Name</label>
+            <input type="text" id="firstName" value="${firstName}" required>
+        </div>
+        <div class="form-group">
+            <label for="lastName">Last Name</label>
+            <input type="text" id="lastName" value="${lastName}" required>
+        </div>
+        <div class="form-group">
+            <label for="email">Email</label>
+            <input type="email" id="email" value="${email}" required>
+        </div>
+        <div class="form-group">
+            <label for="isHost">Host Privileges</label>
+            <select id="isHost">
+                <option value="1" ${isHost ? 'selected' : ''}>Yes</option>
+                <option value="0" ${!isHost ? 'selected' : ''}>No</option>
+            </select>
+        </div>
+    `;
+
+    showModal('Edit User', fields, async () => {
+        const formData = {
+            first_name: document.getElementById('firstName').value,
+            last_name: document.getElementById('lastName').value,
+            email: document.getElementById('email').value,
+            is_host: document.getElementById('isHost').value === '1'
+        };
+
+        try {
+            const response = await fetch(`/api/Users/${userId}`, {
+                method: 'PATCH',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(formData)
+            });
+
+            if (response.ok) {
+                // Update the row in the table
+                row.cells[1].textContent = formData.first_name;
+                row.cells[2].textContent = formData.last_name;
+                row.cells[3].textContent = formData.email;
+                row.cells[4].textContent = formData.is_host ? 'Yes' : 'No';
+            } else {
+                console.error('Failed to update user');
+            }
+        } catch (error) {
+            console.error('Error updating user:', error);
+        }
+    });
+}
+
+async function editSpace(row) {
+    const spaceId = row.querySelector('.delete').getAttribute('data-id');
+    const name = row.cells[1].textContent;
+    const description = row.cells[2].textContent;
+    const capacity = row.cells[3].textContent;
+    const isApproved = row.cells[4].textContent === 'Yes';
+
+    const fields = `
+        <div class="form-group">
+            <label for="spaceName">Space Name</label>
+            <input type="text" id="spaceName" value="${name}" required>
+        </div>
+        <div class="form-group">
+            <label for="description">Description</label>
+            <input type="text" id="description" value="${description}" required>
+        </div>
+        <div class="form-group">
+            <label for="capacity">Capacity</label>
+            <input type="number" id="capacity" value="${capacity}" required>
+        </div>
+        <div class="form-group">
+            <label for="isApproved">Approved</label>
+            <select id="isApproved">
+                <option value="1" ${isApproved ? 'selected' : ''}>Yes</option>
+                <option value="0" ${!isApproved ? 'selected' : ''}>No</option>
+            </select>
+        </div>
+    `;
+
+    showModal('Edit Space', fields, async () => {
+        const formData = {
+            space_name: document.getElementById('spaceName').value,
+            description: document.getElementById('description').value,
+            capacity: document.getElementById('capacity').value,
+            is_approved: document.getElementById('isApproved').value === '1'
+        };
+
+        try {
+            const response = await fetch(`/api/spaces/${spaceId}`, {
+                method: 'PATCH',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(formData)
+            });
+
+            if (response.ok) {
+                // Update the row in the table
+                row.cells[1].textContent = formData.space_name;
+                row.cells[2].textContent = formData.description;
+                row.cells[3].textContent = formData.capacity;
+                row.cells[4].textContent = formData.is_approved ? 'Yes' : 'No';
+            } else {
+                console.error('Failed to update space');
+            }
+        } catch (error) {
+            console.error('Error updating space:', error);
+        }
+    });
+}
+
+// Attach edit listeners
+function attachEditListeners() {
+    console.log('Attaching edit listeners');
+    document.querySelectorAll('.edit').forEach(button => {
+        button.addEventListener('click', () => {
+            console.log('Edit button clicked');
+            const row = button.closest('tr');
+            const table = button.closest('table');
+            const tableHeaders = table.querySelector('thead tr, tr:first-child')?.textContent.toLowerCase() || '';
+            console.log('Table headers:', tableHeaders);
+
+            if (tableHeaders.includes('first name') || tableHeaders.includes('host privilages')) {
+                editUser(row);
+            } else if (tableHeaders.includes('space name') || tableHeaders.includes('capacity')) {
+                editSpace(row);
+            }
+        });
+    });
+}
+
+// Modal management functions
+function showModal(title, fields, onSubmit) {
+    const modal = document.querySelector('.modal-overlay');
+    const modalTitle = document.querySelector('#modal-title');
+    const formFields = document.querySelector('#form-fields');
+    const form = document.querySelector('#edit-form');
+
+    modalTitle.textContent = title;
+    formFields.innerHTML = fields;
+    modal.style.display = 'block';
+
+    // Handle form submission
+    form.onsubmit = async (e) => {
+        e.preventDefault();
+        await onSubmit(e);
+        hideModal();
+    };
+
+    // Handle cancel button
+    document.querySelector('.cancel').onclick = hideModal;
+}
+
+function hideModal() {
+    const modal = document.querySelector('.modal-overlay');
+    modal.style.display = 'none';
 }
