@@ -145,3 +145,36 @@ button {
 .checkbox-group label {
     color: white;
 }
+
+.headerSection {
+    justify-content: center;
+    padding: 20px;
+    width: 100%;
+}
+
+#userHeader {
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    margin: 20px;
+    color: var(--font-color);
+}
+
+#userHeader > span, button {
+    margin: 5px;
+}
+
+#userHeader > button {
+    max-width: 100px;
+}
+
+#userHeader > span {
+    font-weight: bold;
+}
+
+#loginHeader {
+    margin: 20px;
+    display: none;
+    align-items: center;
+    justify-content: center;
+}

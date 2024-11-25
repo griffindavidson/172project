@@ -5,20 +5,20 @@ document.addEventListener('DOMContentLoaded', () => {
         .then(user => {
             if (user && user.firstName) {
                 // Show logged-in user header
-                document.getElementById('userHeader').style.display = 'block';
+                document.getElementById('userHeader').style.display = 'flex';
                 document.getElementById('loginHeader').style.display = 'none';
                 document.getElementById('welcomeMessage').textContent =
-                    `Welcome ${user.firstName} ${user.lastName}`;
+                    `Welcome, ${user.firstName} ${user.lastName}`;
             } else {
                 // Show login/signup button
                 document.getElementById('userHeader').style.display = 'none';
-                document.getElementById('loginHeader').style.display = 'block';
+                document.getElementById('loginHeader').style.display = 'flex';
             }
         })
         .catch(error => {
             // If error (not logged in), show login button
             document.getElementById('userHeader').style.display = 'none';
-            document.getElementById('loginHeader').style.display = 'block';
+            document.getElementById('loginHeader').style.display = 'flex';
             console.error('Session check error:', error);
         });
 
@@ -206,33 +206,6 @@ document.addEventListener('DOMContentLoaded', () => {
             })
         .catch(error => { console.error("Error fetching Space Rules", error) });
 });
-
-// still broken, will reimplement later
-async function submit() {
-    const firstName = document.getElementById('name-input').value;
-    const lastName = document.getElementById('name-input').value;
-    const email = document.getElementById('email-input').value;
-    const passwordHash = document.getElementById('password-input').value;
-    const isHost = document.getElementByID('password-input').value;
-
-    try {
-        const response = await fetch('/api/USERS', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json', },
-            body: JSON.stringify({ firstName, lastName, email, passwordHash, isHost }),
-        });
-
-        // handle server response
-        if (response.ok) {
-            location.reload();
-        } else {
-            const error = await response.text();
-            console.log(`Error adding user: ${error}`);
-        }
-    } catch (err) {
-        console.error("Error submitting data: ", err);
-    }
-}
 
 function deleteUser(id) {
     fetch('/api/Users', {
