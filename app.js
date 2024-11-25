@@ -207,7 +207,8 @@ app.post('/api/spaces', (req, res) => {
 // SPACE GET METHOD
 app.get('/api/spaces', (req, res) => {
     const query = `
-        SELECT CONCAT(u.first_name, " ", u.last_name) as host, s.space_name, s.description, s.capacity, s.is_approved,
+        SELECT s.space_id, CONCAT(u.first_name, " ", u.last_name) as host,
+            s.space_name, s.description, s.capacity, s.is_approved,
             s.created_at, s.modified_at
         FROM Spaces s
         JOIN Users u ON s.host_id = u.user_id
@@ -295,24 +296,6 @@ app.post('/api/operating-hours', (req, res) => {
 // OPERATING HOURS GET METHOD
 app.get('/api/operating-hours/:id', (req, res) => {
     if (isReservationRequest(req)) {
-        // Specific query for reservation page
-        const query = `
-            SELECT oh.*, s.space_name
-            FROM OperatingHours oh
-            JOIN Spaces s ON s.space_id = oh.space_id
-            WHERE oh.space_id = ?
-            ORDER BY oh.day_of_week
-        `;
-
-        db.query(query, [req.params.id], (err, results) => {
-            if (err) {
-                res.status(500).json({ error: err.message });
-            } else {
-                res.json(results);
-            }
-        });
-    } else {
-        // Original query for other pages
         const query = `
             SELECT o.space_id, o.day_of_week, o.open_time, o.close_time, o.is_closed, s.space_name
             FROM OperatingHours o
@@ -329,7 +312,6 @@ app.get('/api/operating-hours/:id', (req, res) => {
                 res.json(results);
             }
         });
-    }
 });
 
 // OPERATING HOURS DELETE METHOD
@@ -464,25 +446,6 @@ app.post('/api/space-rules', (req, res) => {
 
 // SPACE RULES GET METHOD
 app.get('/api/space-rules/:id', (req, res) => {
-    if (isReservationRequest(req)) {
-        // Specific query for reservation page
-        const query = `
-            SELECT sr.*, s.space_name
-            FROM SpaceRules sr
-            JOIN Spaces s ON s.space_id = sr.space_id
-            WHERE sr.space_id = ?
-        `;
-
-        db.query(query, [req.params.id], (err, results) => {
-            if (err) {
-                res.status(500).json({ error: err.message });
-            } else if (results.length === 0) {
-                res.status(404).json({ error: 'Space rules not found' });
-            } else {
-                res.json(results[0]);
-            }
-        });
-    } else {
         // Original query for other pages
         const query = `
             SELECT sr.space_id, s.space_name, sr.min_duration_minutes, sr.max_duration_minutes,
@@ -501,7 +464,6 @@ app.get('/api/space-rules/:id', (req, res) => {
                 res.json(results[0]);
             }
         });
-    }
 });
 
 // SPACE RULES DELETE METHOD

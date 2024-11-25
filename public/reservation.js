@@ -49,17 +49,34 @@ function checkUserSession() {
 }
 
 function loadSpaces() {
+    console.log('Loading spaces...');
     fetch('/api/spaces')
         .then(response => response.json())
         .then(spaces => {
-            console.log('Loaded spaces:', spaces); // Debug log
+            console.log('Loaded spaces:', spaces);
             const select = document.getElementById('spaceSelect');
-            select.innerHTML = '<option value="">Choose a space...</option>'; // Reset dropdown
-            spaces.forEach(space => {
+
+            // Clear existing options
+            select.innerHTML = '<option value="">Choose a space...</option>';
+
+            // Add specific index as value since space_id isn't in response
+            spaces.forEach((space, index) => {
+                console.log(`Creating option for space ${index + 1}:`, space);
                 const option = document.createElement('option');
-                option.value = space.space_id;
+                option.value = index + 1;  // Use 1-based index as temporary ID
                 option.textContent = space.space_name;
                 select.appendChild(option);
+            });
+
+            // Debug check
+            console.log('Final select options:', Array.from(select.options).map(opt => ({
+                value: opt.value,
+                text: opt.textContent
+            })));
+
+            select.addEventListener('change', (event) => {
+                console.log('Selected value:', event.target.value);
+                handleSpaceSelection(event);
             });
         })
         .catch(error => {
