@@ -294,27 +294,39 @@ app.post('/api/operating-hours', (req, res) => {
 });
 
 // OPERATING HOURS GET METHOD
-app.get('/api/operating-hours/:id', (req, res) => {
-    if (isReservationRequest(req)) {
-        const query = `
-            SELECT o.space_id, o.day_of_week, o.open_time, o.close_time, o.is_closed, s.space_name
-            FROM OperatingHours o
-            JOIN Spaces s ON s.space_id = o.space_id
-            WHERE o.space_id = ?
-            ORDER BY s.space_name, o.day_of_week
-        `;
+app.get('/api/operating-hours', (req, res) => {
+    const query = `
+        SELECT o.space_id, o.day_of_week, o.open_time, o.close_time, o.is_closed, s.space_name
+        FROM OperatingHours o
+        JOIN Spaces s ON s.space_id = o.space_id
+        ORDER BY s.space_name, o.day_of_week
+    `;
 
-        db.query(query, [req.params.id], (err, results) => {
-            if (err) {
-                res.status(500).json({ error: err.message });
-            } else {
-//            console.log("Operating hours results:", results); // Debug log it worx now
-                res.json(results);
-            }
-        });
-    } else {
-        res.status(400).json({ error: 'Invalid request' });
-    }
+    db.query(query, (err, results) => {
+        if (err) {
+            res.status(500).json({ error: err.message });
+        } else {
+            res.json(results);
+        }
+    });
+});
+
+app.get('/api/operating-hours/:id', (req, res) => {
+    const query = `
+        SELECT o.space_id, o.day_of_week, o.open_time, o.close_time, o.is_closed, s.space_name
+        FROM OperatingHours o
+        JOIN Spaces s ON s.space_id = o.space_id
+        WHERE o.space_id = ?
+        ORDER BY s.space_name, o.day_of_week
+    `;
+
+    db.query(query, [req.params.id], (err, results) => {
+        if (err) {
+            res.status(500).json({ error: err.message });
+        } else {
+            res.json(results);
+        }
+    });
 });
 
 // OPERATING HOURS DELETE METHOD
@@ -448,25 +460,42 @@ app.post('/api/space-rules', (req, res) => {
 });
 
 // SPACE RULES GET METHOD
-app.get('/api/space-rules/:id', (req, res) => {
-        // Original query for other pages
-        const query = `
-            SELECT sr.space_id, s.space_name, sr.min_duration_minutes, sr.max_duration_minutes,
-                   sr.created_at, sr.modified_at
-            FROM SpaceRules sr
-            JOIN Spaces s ON s.space_id = sr.space_id
-            WHERE sr.space_id = ?
-        `;
+app.get('/api/space-rules', (req, res) => {
+    const query = `
+        SELECT sr.space_id, s.space_name, sr.min_duration_minutes, sr.max_duration_minutes,
+               sr.created_at, sr.modified_at
+        FROM SpaceRules sr
+        JOIN Spaces s ON s.space_id = sr.space_id
+        ORDER BY s.space_name
+    `;
 
-        db.query(query, [req.params.id], (err, results) => {
-            if (err) {
-                res.status(500).json({ error: err.message });
-            } else if (results.length === 0) {
-                res.status(404).json({ error: 'Space rules not found' });
-            } else {
-                res.json(results[0]);
-            }
-        });
+    db.query(query, (err, results) => {
+        if (err) {
+            res.status(500).json({ error: err.message });
+        } else {
+            res.json(results);
+        }
+    });
+});
+
+app.get('/api/space-rules/:id', (req, res) => {
+    const query = `
+        SELECT sr.space_id, s.space_name, sr.min_duration_minutes, sr.max_duration_minutes,
+               sr.created_at, sr.modified_at
+        FROM SpaceRules sr
+        JOIN Spaces s ON s.space_id = sr.space_id
+        WHERE sr.space_id = ?
+    `;
+
+    db.query(query, [req.params.id], (err, results) => {
+        if (err) {
+            res.status(500).json({ error: err.message });
+        } else if (results.length === 0) {
+            res.status(404).json({ error: 'Space rules not found' });
+        } else {
+            res.json(results[0]);
+        }
+    });
 });
 
 // SPACE RULES DELETE METHOD
