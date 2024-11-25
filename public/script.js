@@ -253,7 +253,68 @@ async function deleteUser(id) {
     }
 }
 
+async function deleteSpace(id) {
+    try {
+        console.log("Deleting space:", id);
+        const response = await fetch('/api/spaces', {
+            method: 'DELETE',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ id }),
+        });
 
+        if (response.ok) {
+            console.log("Space deleted successfully:", id);
+            const rowToDelete = document.querySelector(`button[data-id="${id}"]`).closest('tr');
+            if (rowToDelete) rowToDelete.remove();
+        } else {
+            console.error("Failed to delete space:", await response.text());
+        }
+    } catch (error) {
+        console.error("Error in deleteSpace:", error);
+    }
+}
+
+async function deleteReservation(id) {
+    try {
+        console.log("Deleting reservation:", id);
+        const response = await fetch('/api/reservations', {
+            method: 'DELETE',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ id }),
+        });
+
+        if (response.ok) {
+            console.log("Reservation deleted successfully:", id);
+            const rowToDelete = document.querySelector(`button[data-id="${id}"]`).closest('tr');
+            if (rowToDelete) rowToDelete.remove();
+        } else {
+            console.error("Failed to delete reservation:", await response.text());
+        }
+    } catch (error) {
+        console.error("Error in deleteReservation:", error);
+    }
+}
+
+async function deleteSpaceRule(id) {
+    try {
+        console.log("Deleting space rule:", id);
+        const response = await fetch('/api/space-rules', {
+            method: 'DELETE',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ id }),
+        });
+
+        if (response.ok) {
+            console.log("Space rule deleted successfully:", id);
+            const rowToDelete = document.querySelector(`button[data-id="${id}"]`).closest('tr');
+            if (rowToDelete) rowToDelete.remove();
+        } else {
+            console.error("Failed to delete space rule:", await response.text());
+        }
+    } catch (error) {
+        console.error("Error in deleteSpaceRule:", error);
+    }
+}
 
 
 
@@ -261,15 +322,30 @@ async function deleteUser(id) {
 // run this function when adding new rows
 function attachDeleteListeners() {
     document.querySelectorAll('.delete').forEach(button => {
-        button.addEventListener('click', () => {
-            // Check if this is an operating hours delete button
+        button.addEventListener('click', async () => {
+            // Operating Hours has a special case with two data attributes
             if (button.hasAttribute('data-space-id') && button.hasAttribute('data-day')) {
                 const spaceId = button.getAttribute('data-space-id');
                 const day = button.getAttribute('data-day');
-                deleteOperatingHours(spaceId, day);
+                await deleteOperatingHours(spaceId, day);
+                return;
+            }
+
+            // For all other cases, determine the table type
+            const id = button.getAttribute('data-id');
+            const table = button.closest('table');
+            const tableHeaders = table.querySelector('thead tr, tr:first-child')?.textContent.toLowerCase() || '';
+
+            if (tableHeaders.includes('first name') || tableHeaders.includes('host privilages')) {
+                await deleteUser(id);
+            } else if (tableHeaders.includes('space name') || tableHeaders.includes('capacity')) {
+                await deleteSpace(id);
+            } else if (tableHeaders.includes('reservee name') || tableHeaders.includes('start time')) {
+                await deleteReservation(id);
+            } else if (tableHeaders.includes('minimum duration') || tableHeaders.includes('maximum duration')) {
+                await deleteSpaceRule(id);
             } else {
-                const id = button.getAttribute('data-id');
-                deleteUser(id);
+                console.error('Unknown table type for delete button');
             }
         });
     });
