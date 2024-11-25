@@ -89,7 +89,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // get operating hours table
     fetch('/api/operating-hours')
-        .then(response => response.json())
+        .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                return response.json();
+            })
         .then(data => {
             const weekday = {
                 0: 'Sundays',
