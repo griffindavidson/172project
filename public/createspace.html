@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Create New Space</title>
+  <link rel="stylesheet" type="text/css" href="./styles.css">
+  <script type="text/javascript" src="./createspace.js" defer></script>
+</head>
+<body>
+<div class="headerSection">
+  <!-- Container for logged-in user -->
+  <div id="userHeader">
+    <span id="welcomeMessage"></span>
+    <button onclick="handleLogout()" class="delete">Logout</button>
+    <button onclick="window.location.href='/database.html'" class="submit">Back to Dashboard</button>
+  </div>
+</div>
+
+<div class="form-container">
+  <h1>Create New Space</h1>
+  <form id="createSpaceForm" class="multi-section-form">
+    <!-- Basic Space Information Section -->
+    <section class="form-section">
+      <h2>Basic Information</h2>
+      <div class="form-group">
+        <label for="spaceName">Space Name *</label>
+        <input type="text" id="spaceName" name="spaceName" required
+               maxlength="100" placeholder="Enter space name">
+      </div>
+
+      <div class="form-group">
+        <label for="description">Description *</label>
+        <textarea id="description" name="description" required
+                  placeholder="Describe your space"></textarea>
+      </div>
+
+      <div class="form-group">
+        <label for="capacity">Capacity (persons) *</label>
+        <input type="number" id="capacity" name="capacity" required
+               min="1" max="1000" placeholder="Maximum capacity">
+      </div>
+    </section>
+
+    <!-- Operating Hours Section -->
+    <section class="form-section">
+      <h2>Operating Hours</h2>
+      <div id="operatingHours">
+        <div class="weekday-container">
+          <!-- JavaScript will populate this -->
+        </div>
+      </div>
+    </section>
+
+    <!-- Space Rules Section -->
+    <section class="form-section">
+      <h2>Booking Rules</h2>
+      <div class="form-group">
+        <label for="minDuration">Minimum Duration (minutes) *</label>
+        <input type="number" id="minDuration" name="minDuration" required
+               min="15" max="1440" placeholder="Minimum booking duration">
+      </div>
+
+      <div class="form-group">
+        <label for="maxDuration">Maximum Duration (minutes) *</label>
+        <input type="number" id="maxDuration" name="maxDuration" required
+               min="15" max="1440" placeholder="Maximum booking duration">
+      </div>
+
+      <div class="form-group">
+        <label for="maxAdvance">Maximum Advance Booking (days) *</label>
+        <input type="number" id="maxAdvance" name="maxAdvance" required
+               min="1" max="365" placeholder="How far in advance can users book">
+      </div>
+
+      <div class="form-group">
+        <label for="minNotice">Minimum Notice (hours) *</label>
+        <input type="number" id="minNotice" name="minNotice" required
+               min="0" max="168" placeholder="Minimum notice before booking">
+      </div>
+
+      <div class="form-group">
+        <label for="modificationDeadline">Modification Deadline (hours) *</label>
+        <input type="number" id="modificationDeadline" name="modificationDeadline" required
+               min="1" max="168" placeholder="Hours before booking can be modified">
+      </div>
+    </section>
+
+    <div class="form-actions">
+      <button type="submit" class="submit">Create Space</button>
+      <button type="button" class="delete" onclick="window.location.href='/database.html'">Cancel</button>
+    </div>
+  </form>
+</div>
+
+<!-- Error/Success Message Container -->
+<div id="messageContainer" class="message-container"></div>
+</body>
+</html>

@@ -16,7 +16,7 @@ CREATE TABLE Spaces (
     space_name VARCHAR(100) NOT NULL,
     description TEXT,
     capacity INTEGER,
-    is_approved BOOLEAN DEFAULT 0,
+    is_approved BOOLEAN DEFAULT 1,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     modified_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     CONSTRAINT fk_spaces_host

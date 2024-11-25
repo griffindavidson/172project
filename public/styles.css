@@ -217,3 +217,111 @@ button {
     font-size: 1.5rem;
     text-align: center;
 }
+
+.form-container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+.multi-section-form {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+}
+
+.form-section {
+    background-color: var(--root-background-color);
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.form-section h2 {
+    margin-bottom: 1rem;
+    color: var(--font-color);
+    font-size: 1.5rem;
+}
+
+.form-group {
+    margin-bottom: 1rem;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 0.5rem;
+    color: var(--font-color);
+    font-weight: bold;
+}
+
+.form-group input,
+.form-group textarea {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid var(--table-border-color);
+    border-radius: 4px;
+    background-color: var(--root-background-color);
+    color: var(--font-color);
+}
+
+.form-group textarea {
+    min-height: 100px;
+    resize: vertical;
+}
+
+.weekday-container {
+    display: grid;
+    gap: 1rem;
+}
+
+.weekday-row {
+    display: grid;
+    grid-template-columns: 100px 1fr 1fr 100px;
+    gap: 1rem;
+    align-items: center;
+}
+
+.weekday-row label {
+    margin: 0;
+}
+
+.form-actions {
+    display: flex;
+    gap: 1rem;
+    justify-content: flex-end;
+}
+
+.message-container {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 1000;
+}
+
+.message {
+    padding: 1rem;
+    border-radius: 4px;
+    margin-bottom: 0.5rem;
+    animation: slideIn 0.3s ease-out;
+}
+
+.message.error {
+    background-color: #ff4444;
+    color: white;
+}
+
+.message.success {
+    background-color: #00C851;
+    color: white;
+}
+
+@keyframes slideIn {
+    from {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
